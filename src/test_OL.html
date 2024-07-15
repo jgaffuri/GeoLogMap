@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenLayers Vector Tiles</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol/ol.css">
+    <script src="https://cdn.jsdelivr.net/npm/ol/ol.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        // Create a new OpenLayers map
+        const map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                new ol.layer.VectorTile({
+                    source: new ol.source.VectorTile({
+                        format: new ol.format.MVT(),
+                        url: 'http://localhost:8000/tiles_directory/{z}/{x}/{y}.pbf',
+                        tileGrid: ol.tilegrid.createXYZ({ maxZoom: 14 }) // Adjust maxZoom to your data
+                    })
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([0, 0]), // Set the center to your desired coordinates
+                zoom: 2 // Set the initial zoom level
+            })
+        });
+    </script>
+</body>
+</html>
