@@ -1,0 +1,16 @@
+{
+"name": "assets/test/",
+"description": "assets/test/",
+"version": "2",
+"minzoom": "0",
+"maxzoom": "18",
+"center": "5.399094,43.302695,18",
+"bounds": "5.393308,43.301661,5.401587,43.306328",
+"antimeridian_adjusted_bounds": "5.393308,43.301661,5.401587,43.306328",
+"type": "overlay",
+"strategies": "[{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1077},{\"tiny_polygons\":1071},{\"tiny_polygons\":970},{\"tiny_polygons\":451},{\"tiny_polygons\":132},{},{},{},{\"tiny_polygons\":3},{\"tiny_polygons\":1},{\"tiny_polygons\":1}]",
+"format": "pbf",
+"generator": "tippecanoe v2.55.0",
+"generator_options": "tippecanoe -e assets/test/ -Z 0 -z 18 assets/bat_mars.geojson",
+"json": "{\"vector_layers\":[{\"id\":\"bat_mars\",\"description\":\"\",\"minzoom\":0,\"maxzoom\":18,\"fields\":{}}],\"tilestats\":{\"layerCount\":1,\"layers\":[{\"layer\":\"bat_mars\",\"count\":1077,\"geometry\":\"Polygon\",\"attributeCount\":0,\"attributes\":[]}]}}"
+}

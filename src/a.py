@@ -1,7 +1,7 @@
 
 #fake server
 ogr2ogr -f GeoJSON data.json yourfile.gpkg
-tippecanoe -e tiles_directory -Z 0 -z 14 data.json
+tippecanoe -e assets/test/ -Z 0 -z 18 assets/bat_mars.geojson
 
 
 # check client

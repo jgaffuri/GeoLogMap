@@ -3,39 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenLayers Vector Tiles</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol/ol.css">
-    <script src="https://cdn.jsdelivr.net/npm/ol/ol.js"></script>
+    <title>OpenLayers Vector Tiles Example</title>
+    <!-- Include OpenLayers CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css" type="text/css">
+    <!-- Include OpenLayers JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
     <style>
+        /* Define a height for the map container */
         #map {
-            width: 100%;
             height: 100vh;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <div id="map" class="map"></div>
-    <script type="text/javascript">
-        // Create a new OpenLayers map
-        const map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
+    <div id="map"></div>
+    <script>
+
+// Initialize the map
+var map = new ol.Map({
+    target: 'map',
+    layers: [
+        // Add a new tile layer source
+        new ol.layer.Tile({
+            source: new ol.source.OSM() // Use OpenStreetMap as base layer for context
+        }),
+        // Add a vector tile layer
+        new ol.layer.VectorTile({
+            source: new ol.source.VectorTile({
+                format: new ol.format.MVT(), // Specify format for vector tiles
+                tileGrid: ol.tilegrid.createXYZ({ maxZoom: 19 }), // Define max zoom level
+                url: 'http://127.0.0.1:5500/assets/test/{z}/{x}/{y}.pbf' // URL pattern for your vector tiles
+            }),
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)' // Default fill color for vector features
                 }),
-                new ol.layer.VectorTile({
-                    source: new ol.source.VectorTile({
-                        format: new ol.format.MVT(),
-                        url: 'http://localhost:8000/tiles_directory/{z}/{x}/{y}.pbf',
-                        tileGrid: ol.tilegrid.createXYZ({ maxZoom: 14 }) // Adjust maxZoom to your data
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33', // Default stroke color for vector features
+                    width: 2
+                }),
+                text: new ol.style.Text({
+                    font: '12px Calibri,sans-serif',
+                    fill: new ol.style.Fill({ color: '#000' }),
+                    stroke: new ol.style.Stroke({
+                        color: '#fff', width: 2
                     })
                 })
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([0, 0]), // Set the center to your desired coordinates
-                zoom: 2 // Set the initial zoom level
             })
-        });
+        })
+    ],
+    view: new ol.View({
+        center: ol.proj.fromLonLat([5.3976, 43.3036]), // Set the center of the map
+        zoom: 17 // Initial zoom level
+    })
+});
+
+
     </script>
 </body>
 </html>

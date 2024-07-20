@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Vector Tiles</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.vectorgrid/dist/Leaflet.VectorGrid.js"></script>
+</head>
+<body>
+<div id="map" style="height: 100vh;"></div>
+<script>
+ 
+    var map = L.map('map').setView([43.3036, 5.3976], 10); // Set initial center and zoom level
+    var vectorTileOptions = {
+        rendererFactory: L.canvas.tile,
+        vectorTileLayerStyles: {
+            layer_name: function(properties, zoom) {
+                // Optional: define styles based on properties or zoom level
+                return {
+                    fillColor: '#0000FF',
+                    fillOpacity: 0.5,
+                    stroke: true,
+                    color: '#FFFFFF',
+                    weight: 1
+                };
+            }
+        }
+    };
+    
+    var vectorTileLayer = L.vectorGrid.protobuf('http://127.0.0.1:5500/assets/test/{z}/{x}/{y}.pbf', vectorTileOptions).addTo(map);
+    </script>
+</body>
+</html>
