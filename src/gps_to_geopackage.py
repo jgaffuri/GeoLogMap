@@ -76,11 +76,11 @@ def parse_fit(file_path):
         lon = None
         time = None
         for record_data in record:
-            if record_data.name == 'position_lat':
+            if record_data.name == 'position_lat' and record_data.value is not None:
                 lat = record_data.value * (180 / 2**31)  # Convert semicircles to degrees
-            elif record_data.name == 'position_long':
+            elif record_data.name == 'position_long' and record_data.value is not None:
                 lon = record_data.value * (180 / 2**31)  # Convert semicircles to degrees
-            elif record_data.name == 'timestamp':
+            elif record_data.name == 'timestamp' and record_data.value is not None:
                 time = record_data.value
         
         if lat is not None and lon is not None and time is not None:
@@ -103,17 +103,22 @@ def parse_fit(file_path):
 
 
 def create_geopackage(folder_path, output_file):
+
+    files = os.listdir(folder_path)
+    print(len(files),"files")
+
     traces = []
-    for file in os.listdir(folder_path):
-        #try:
-            #if file.endswith(".gpx"):
-            #    traces.extend(parse_gpx(os.path.join(folder_path, file)))
-            #if file.endswith(".tcx"):
-            #    traces.extend(parse_tcx(os.path.join(folder_path, file)))
-            if file.endswith(".fit"):
+    for file in files:
+        try:
+            if file.endswith(".gpx"):
+                traces.extend(parse_gpx(os.path.join(folder_path, file)))
+            elif file.endswith(".tcx"):
+                traces.extend(parse_tcx(os.path.join(folder_path, file)))
+            elif file.endswith(".fit"):
                 traces.extend(parse_fit(os.path.join(folder_path, file)))
-        #except:
-        #    print("Error when parsing file: "+file)
+        except Exception as e:
+            print("Error when reading file: "+file)
+            print(e)
 
     gdf = gpd.GeoDataFrame(traces, crs="EPSG:4326")
     gdf.to_file(output_file, layer='gps_traces', driver='GPKG')
