@@ -124,4 +124,4 @@ def create_geopackage(folder_path, output_file):
     gdf.to_file(output_file, layer='gps_traces', driver='GPKG')
 
 
-create_geopackage("/home/juju/geodata/GPS/traces_export_stava", "/home/juju/geodata/GPS/traces.gpkg")
+create_geopackage("/home/juju/geodata/GPS/traces_gpx", "/home/juju/geodata/GPS/traces.gpkg")
