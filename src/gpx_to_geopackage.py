@@ -27,10 +27,13 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         traces.append({
                             'geometry': line,
                             'id': str(id),
-                            'start_time': str(start_time),
-                            'end_time': str(end_time)
+                            'start_time': str(start_time).replace("+00:00",""),
+                            'end_time': str(end_time).replace("+00:00","")
                         })
                         id += 1
+
+                        #print(str(start_time).replace("+00:00",""))
+                        #print(str(end_time).replace("+00:00",""))
 
         except Exception as e:
             print("Error when reading file: "+file)
