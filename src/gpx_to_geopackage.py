@@ -4,32 +4,7 @@ from shapely.geometry import LineString
 import gpxpy
 
 
-
-
-def parse_gpx(file_path):
-    traces = []
-    with open(file_path, 'r') as gpx_file:
-        gpx = gpxpy.parse(gpx_file)
-        for track in gpx.tracks:
-            for segment in track.segments:
-                if len(segment.points) > 1:
-                    points = [(point.longitude, point.latitude) for point in segment.points]
-                    times = [point.time for point in segment.points]
-                    line = LineString(points)
-                    start_time = times[0]
-                    end_time = times[-1]
-                    traces.append({
-                        'geometry': line,
-                        'start_time': start_time,
-                        'end_time': end_time
-                    })
-    return traces
-
-
-
-
-
-def create_geopackage(folder_path, output_file):
+def create_geopackage_from_gpx(folder_path, output_file):
 
     files = os.listdir(folder_path)
     print(len(files),"files")
@@ -37,7 +12,23 @@ def create_geopackage(folder_path, output_file):
     traces = []
     for file in files:
         try:
-            traces.extend(parse_gpx(os.path.join(folder_path, file)))
+            file_path = os.path.join(folder_path, file)
+            with open(file_path, 'r') as gpx_file:
+                gpx = gpxpy.parse(gpx_file)
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        if len(segment.points) <= 1: continue
+                        points = [(point.longitude, point.latitude) for point in segment.points]
+                        times = [point.time for point in segment.points]
+                        line = LineString(points)
+                        start_time = times[0]
+                        end_time = times[-1]
+                        traces.append({
+                            'geometry': line,
+                            'start_time': str(start_time),
+                            'end_time': str(end_time)
+                        })
+
         except Exception as e:
             print("Error when reading file: "+file)
             print(e)
@@ -48,4 +39,4 @@ def create_geopackage(folder_path, output_file):
     gdf.to_file(output_file, layer='gps_traces', driver='GPKG')
 
 
-create_geopackage("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces.gpkg")
+create_geopackage_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces.gpkg")
