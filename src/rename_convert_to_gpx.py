@@ -120,27 +120,32 @@ def convert_to_gpx(input_folder, output_folder):
         os.makedirs(output_folder)
     
     for file in os.listdir(input_folder):
-        input_file_path = os.path.join(input_folder, file)
-        start_time = None
-        gpx = None
+        try:
+            input_file_path = os.path.join(input_folder, file)
+            start_time = None
+            gpx = None
 
-        if file.endswith(".gpx"):
-            start_time = get_start_time_from_gpx(input_file_path)
-            with open(input_file_path, 'r') as gpx_file:
-                gpx = gpxpy.parse(gpx_file)
-        elif file.endswith(".tcx"):
-            start_time = get_start_time_from_tcx(input_file_path)
-            gpx = convert_tcx_to_gpx(input_file_path)
-        elif file.endswith(".fit"):
-            start_time = get_start_time_from_fit(input_file_path)
-            gpx = convert_fit_to_gpx(input_file_path)
+            if file.endswith(".gpx"):
+                start_time = get_start_time_from_gpx(input_file_path)
+                with open(input_file_path, 'r') as gpx_file:
+                    gpx = gpxpy.parse(gpx_file)
+            elif file.endswith(".tcx"):
+                start_time = get_start_time_from_tcx(input_file_path)
+                gpx = convert_tcx_to_gpx(input_file_path)
+            elif file.endswith(".fit"):
+                start_time = get_start_time_from_fit(input_file_path)
+                gpx = convert_fit_to_gpx(input_file_path)
 
-        if start_time and gpx:
-            new_file_name = start_time.strftime("%Y-%m-%d_%H-%M-%S.gpx")
-            new_file_path = os.path.join(output_folder, new_file_name)
-            with open(new_file_path, 'w') as new_gpx_file:
-                new_gpx_file.write(gpx.to_xml())
-            print(f"Processed {file} and saved as {new_file_name}")
+            if start_time and gpx:
+                new_file_name = start_time.strftime("%Y-%m-%d_%H-%M-%S.gpx")
+                new_file_path = os.path.join(output_folder, new_file_name)
+                with open(new_file_path, 'w') as new_gpx_file:
+                    new_gpx_file.write(gpx.to_xml())
+                print(f"Processed {file} and saved as {new_file_name}")
+
+        except Exception as e:
+            print("Error when dealing with file: "+file)
+            print(e)
 
 
 #rename_files_in_folder("/home/juju/geodata/GPS/traces_export_stava")
