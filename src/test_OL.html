@@ -32,8 +32,8 @@ var map = new ol.Map({
         new ol.layer.VectorTile({
             source: new ol.source.VectorTile({
                 format: new ol.format.MVT(), // Specify format for vector tiles
-                tileGrid: ol.tilegrid.createXYZ({ maxZoom: 19 }), // Define max zoom level
-                url: 'http://127.0.0.1:5500/assets/test/{z}/{x}/{y}.pbf' // URL pattern for your vector tiles
+                tileGrid: ol.tilegrid.createXYZ({ maxZoom: 15 }), // Define max zoom level
+                url: 'http://127.0.0.1:5500/assets/gps/{z}/{x}/{y}.pbf' // URL pattern for your vector tiles
             }),
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
@@ -55,7 +55,7 @@ var map = new ol.Map({
     ],
     view: new ol.View({
         center: ol.proj.fromLonLat([5.3976, 43.3036]), // Set the center of the map
-        zoom: 17 // Initial zoom level
+        zoom: 15 // Initial zoom level
     })
 });
 

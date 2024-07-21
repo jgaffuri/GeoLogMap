@@ -3,6 +3,13 @@
 ogr2ogr -f GeoJSON data.json yourfile.gpkg
 tippecanoe -e assets/test/ -Z 0 -z 18 assets/bat_mars.geojson
 
+tippecanoe -e ../../workspace/GeoLogMap/assets/gps/ -Z 0 -z 15 traces.geojson --force
+
+
+
+ogr2ogr -f MBTILES target.mbtiles source.gpkg -dsco MAXZOOM=10
+
+
 
 # check client
 # OL https://openlayers.org/workshop/en/vectortile/
