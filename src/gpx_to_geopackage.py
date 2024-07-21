@@ -6,6 +6,7 @@ import gpxpy
 
 def create_geopackage_from_gpx(folder_path, output_file):
 
+    id = 1
     files = os.listdir(folder_path)
     print(len(files),"files")
 
@@ -25,9 +26,11 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         end_time = times[-1]
                         traces.append({
                             'geometry': line,
+                            'id': str(id),
                             'start_time': str(start_time),
                             'end_time': str(end_time)
                         })
+                        id += 1
 
         except Exception as e:
             print("Error when reading file: "+file)
