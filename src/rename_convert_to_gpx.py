@@ -141,7 +141,7 @@ def convert_to_gpx(input_folder, output_folder):
                 new_file_path = os.path.join(output_folder, new_file_name)
                 with open(new_file_path, 'w') as new_gpx_file:
                     new_gpx_file.write(gpx.to_xml())
-                print(f"Processed {file} and saved as {new_file_name}")
+                #print(f"Processed {file} and saved as {new_file_name}")
 
         except Exception as e:
             print("Error when dealing with file: "+file)
@@ -149,5 +149,5 @@ def convert_to_gpx(input_folder, output_folder):
 
 
 #rename_files_in_folder("/home/juju/geodata/GPS/traces_export_stava")
-#convert_to_gpx("/home/juju/geodata/GPS/traces_gpx","/home/juju/geodata/GPS/traces")
+convert_to_gpx("/home/juju/geodata/GPS/traces_gpx","/home/juju/geodata/GPS/traces")
 convert_to_gpx("/home/juju/geodata/GPS/traces_export_stava","/home/juju/geodata/GPS/traces")
