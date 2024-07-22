@@ -23,8 +23,6 @@
             .then(response => response.json())
             .then(metadata => {
 
-                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
-
                 //build map
                 var map = new ol.Map({
                     target: 'map',
@@ -57,6 +55,27 @@
                 map.addLayer(vectorLayer);
 
 
+
+                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
+
+                //
+                function transformGeoJSONGeometryCoordinates(geometry, tile) {
+                    function transformCoordinates(coordinates) {
+                        if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
+                        else {
+                            const x = coordinates[0], y = coordinates[1]
+                            //console.log(coordinates)
+                            //TODO transform
+                            return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
+                        }
+                    }
+                    if (geometry && geometry.coordinates)
+                        geometry.coordinates = transformCoordinates(geometry.coordinates);
+                }
+
+
+
+
                 function updateLayer() {
                     var bbox = map.getView().calculateExtent(map.getSize());
                     //var bbox = extent //ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
@@ -82,25 +101,9 @@
                             fetch(`http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`)
                                 .then(response => response.json())
                                 .then(geojson => {
-                                    //const geojson = response.json()
-
-                                    //
-                                    function transformGeoJSONGeometryCoordinates(geometry) {
-                                        function transformCoordinates(coordinates) {
-                                            if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
-                                            else {
-                                                const x = coordinates[0], y = coordinates[1]
-                                                //console.log(coordinates)
-                                                //TODO transform
-                                                return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
-                                            }
-                                        }
-                                        if (geometry && geometry.coordinates)
-                                            geometry.coordinates = transformCoordinates(geometry.coordinates);
-                                    }
 
                                     //apply coordinates transformation to features
-                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry));
+                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile));
 
                                     //transform into OL feature
                                     var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
