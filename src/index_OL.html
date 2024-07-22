@@ -51,13 +51,25 @@
                         .then(geojson => {
                             console.log("Loaded !")
                             //console.log(geojson)
+
+                            //
+                            function transformGeoJSONGeometryCoordinates(geometry) {
+                                function transformCoordinates(coordinates) {
+                                    if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
+                                    else {
+                                        //TODO transform                    
+                                        return coordinates;
+                                    }
+                                }
+                                if (geometry && geometry.coordinates)
+                                    geometry.coordinates = transformCoordinates(geometry.coordinates);
+                            }
+
+                            //apply coordinates transformation to features
                             geojson.features.forEach(feature => {
-                                feature.geometry.coordinates = feature.geometry.coordinates.map(coordinate => {
-                                    console.log(coordinate)
-                                    return coordinate
-                                    // Apply your transformation logic here, if any
-                                    //return ol.proj.fromLonLat(coordinate);
-                                });
+                                console.log(feature.geometry)
+                                transformGeoJSONGeometryCoordinates(feature.geometry)
+                                console.log(feature.geometry)
                             });
                             return geojson;
                         });
