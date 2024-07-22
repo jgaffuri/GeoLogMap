@@ -56,21 +56,19 @@
 
 
 
-                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
 
-                //
+                //transform geojson geometry coordinate from tile CRS to map CRS
+                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
                 function transformGeoJSONGeometryCoordinates(geometry, tile) {
                     function transformCoordinates(coordinates) {
                         if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
                         else {
                             const x = coordinates[0], y = coordinates[1]
-                            //console.log(coordinates)
-                            //TODO transform
                             return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
                         }
                     }
-                    if (geometry && geometry.coordinates)
-                        geometry.coordinates = transformCoordinates(geometry.coordinates);
+                    //if (geometry && geometry.coordinates)
+                    geometry.coordinates = transformCoordinates(geometry.coordinates);
                 }
 
 
@@ -91,7 +89,7 @@
                         if (features == "failed" || features == "loading") {
                             //do nothing
                         } else if (features) {
-                            //add to layer
+                            //add cached features to layer
                             vectorSource.addFeatures(features);
                         } else {
                             //mark as loading
@@ -108,10 +106,10 @@
                                     //transform into OL feature
                                     var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
 
-                                    //store in cache
+                                    //store into cache
                                     insertInCache(tile, features)
 
-                                    //add to layer
+                                    //add features to layer
                                     vectorSource.addFeatures(features);
                                 })
                                 .catch(error => {
