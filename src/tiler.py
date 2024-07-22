@@ -8,30 +8,35 @@ import json
 
 
 
-def round_coords(geometry, precision=3):
+def resolutionise_tile(xmin, ymin, geometry, resolution):
     if geometry.is_empty:
         return geometry
 
-    def _round_coords(coords):
-        return tuple(round(coord, precision) for coord in coords)
+    def _reso_x(x):
+        return (x-xmin)/resolution
+    def _reso_y(y):
+        return (y-ymin)/resolution
+
+    def _resos(coords):
+        return tuple(_reso_x(coords[0]), _reso_y(coords[1]))
 
     if geometry.geom_type == 'Point':
-        return type(geometry)(*map(_round_coords, [geometry.coords[0]]))
+        return type(geometry)(*map(_resos, [geometry.coords[0]]))
     elif geometry.geom_type in ['LineString', 'LinearRing']:
-        return type(geometry)(list(map(_round_coords, geometry.coords)))
+        return type(geometry)(list(map(_resos, geometry.coords)))
     elif geometry.geom_type == 'Polygon':
-        exterior = list(map(_round_coords, geometry.exterior.coords))
-        interiors = [list(map(_round_coords, ring.coords)) for ring in geometry.interiors]
+        exterior = list(map(_resos, geometry.exterior.coords))
+        interiors = [list(map(_resos, ring.coords)) for ring in geometry.interiors]
         return type(geometry)(exterior, interiors)
     elif geometry.geom_type == 'MultiPoint':
-        return type(geometry)([type(geometry.geoms[0])(list(map(_round_coords, geom.coords))) for geom in geometry.geoms])
+        return type(geometry)([type(geometry.geoms[0])(list(map(_resos, geom.coords))) for geom in geometry.geoms])
     elif geometry.geom_type == 'MultiLineString':
-        return type(geometry)([type(geometry.geoms[0])(list(map(_round_coords, geom.coords))) for geom in geometry.geoms])
+        return type(geometry)([type(geometry.geoms[0])(list(map(_resos, geom.coords))) for geom in geometry.geoms])
     elif geometry.geom_type == 'MultiPolygon':
         return type(geometry)([
             type(geometry.geoms[0])(
-                list(map(_round_coords, geom.exterior.coords)),
-                [list(map(_round_coords, ring.coords)) for ring in geom.interiors]
+                list(map(_resos, geom.exterior.coords)),
+                [list(map(_resos, ring.coords)) for ring in geom.interiors]
             )
             for geom in geometry.geoms
         ])
@@ -43,7 +48,7 @@ def round_coords(geometry, precision=3):
 
 
 
-def tile_geopackage(input_gpkg_path, output_folder, tile_size):
+def tile(input_gpkg_path, output_folder, tile_size, resolution):
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
 
@@ -75,8 +80,8 @@ def tile_geopackage(input_gpkg_path, output_folder, tile_size):
                 # skip if empty
                 if(len(clipped_gdf)==0): continue
 
-                # Round the coordinates of each geometry
-                clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: round_coords(geom, precision=3))
+                # round coordinates
+                clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
 
                 # output file
                 output_file = os.path.join(output_folder, f"{i}/{j}.geojson")
@@ -89,4 +94,4 @@ def tile_geopackage(input_gpkg_path, output_folder, tile_size):
 
 
 #
-tile_geopackage("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 100000)
+tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 100000, 1000)
