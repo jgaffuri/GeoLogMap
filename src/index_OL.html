@@ -95,6 +95,7 @@
                             //do nothing
                         } else if (features) {
                             //add cached features to layer
+                            //features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
                             vectorSource.addFeatures(features);
                         } else {
                             //mark as loading
@@ -115,6 +116,7 @@
                                     insertInCache(tile, features)
 
                                     //add features to layer
+                                    //features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
                                     vectorSource.addFeatures(features);
                                 })
                                 .catch(error => {
