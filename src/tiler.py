@@ -48,37 +48,35 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
 
 
 
-def tile(input_gpkg_path, output_folder, tile_size, resolution, minx = 0, miny = 0):
+def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0):
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
 
     # Open the input GeoPackage file
     with fiona.open(input_gpkg_path) as src:
-        # data bounding box
-        minx___, miny___, maxx, maxy = src.bounds
 
-        # tile numbers
-        nbx = int((maxx - minx) / tile_size) + 1
-        nby = int((maxy - miny) / tile_size) + 1
+        # data bounding box
+        minx, miny, maxx, maxy = src.bounds
+
+        # tile
+        mintx = int((minx-origin_x)/tile_size)
+        maxtx = int((maxx-origin_x)/tile_size) +1
+        minty = int((miny-origin_y)/tile_size)
+        maxty = int((maxy-origin_y)/tile_size) +1
 
         # load into a GeoDataFrame
+        print("Load data from", input_gpkg_path)
         gdf = gpd.read_file(input_gpkg_path)
+        print(len(gdf))
 
-        # 
-        metadata = {
-            "minx" : minx,
-            "miny" : miny,
-            "tile_size" : tile_size
-        }
-
-        for i in range(nbx):
-            for j in range(nby):
+        for ti in range(mintx, maxtx):
+            for tj in range(minty, maxty):
 
                 # tile bounds
-                tile_minx = minx + i * tile_size
-                tile_maxx = minx + (i + 1) * tile_size
-                tile_miny = miny + j * tile_size
-                tile_maxy = miny + (j + 1) * tile_size
+                tile_minx = origin_x + ti * tile_size
+                tile_maxx = origin_x + (ti + 1) * tile_size
+                tile_miny = origin_y + tj * tile_size
+                tile_maxy = origin_y + (tj + 1) * tile_size
                 tile_bounds = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
 
                 # clip input to tile bounds
@@ -92,7 +90,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, minx = 0, miny =
                 clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
 
                 # output file
-                output_file = os.path.join(output_folder, f"{i}/{j}.geojson")
+                output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
                 os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
                 # save
@@ -100,9 +98,16 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, minx = 0, miny =
 
 
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:
+        # 
+        metadata = {
+            "origin_x" : origin_x,
+            "origin_y" : origin_y,
+            "tile_size" : tile_size
+        }
+
         json.dump(metadata, json_file, indent=3)
 
 
 
 #
-tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 500000, 1000)
+tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 100000, 1000)
