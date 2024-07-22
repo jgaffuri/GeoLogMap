@@ -23,6 +23,8 @@
             .then(response => response.json())
             .then(metadata => {
 
+                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
+
                 //build map
                 var map = new ol.Map({
                     target: 'map',
@@ -49,16 +51,15 @@
                     return fetch(url)
                         .then(response => response.json())
                         .then(geojson => {
-                            console.log("Loaded !")
-                            //console.log(geojson)
-
                             //
                             function transformGeoJSONGeometryCoordinates(geometry) {
                                 function transformCoordinates(coordinates) {
                                     if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
                                     else {
-                                        //TODO transform                    
-                                        return coordinates;
+                                        const x = coordinates[0], y = coordinates[1]
+                                        //console.log(coordinates)
+                                        //TODO transform
+                                        return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
                                     }
                                 }
                                 if (geometry && geometry.coordinates)

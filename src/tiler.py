@@ -129,7 +129,8 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
         metadata = {
             "origin_x" : origin_x,
             "origin_y" : origin_y,
-            "tile_size" : tile_size
+            "tile_size" : tile_size,
+            "resolution" : resolution
         }
 
         json.dump(metadata, json_file, indent=3)
