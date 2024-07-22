@@ -1,17 +1,19 @@
 import os
 import fiona
-from shapely.geometry import box, shape, mapping
-from shapely.ops import transform
-from shapely import wkt
+from shapely.geometry import box #, shape, mapping
+#from shapely.ops import transform
+#from shapely import wkt
 import geopandas as gpd
 import json
 import math
+#import numpy as np
 
 
 def resolutionise_tile(xmin, ymin, geometry, resolution):
     if geometry.is_empty:
         return geometry
 
+#np.round(coords).astype(int)
     def _reso_x(x):
         return int(math.floor((x-xmin)/resolution))
     def _reso_y(y):
@@ -43,6 +45,30 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
     else:
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
 
+
+def round_coords_to_int(geom):
+    """Recursively round coordinates of a geometry to integers."""
+    if isinstance(geom, dict):
+        if 'coordinates' in geom:
+            geom['coordinates'] = round_coords_to_int(geom['coordinates'])
+        else:
+            for key in geom:
+                geom[key] = round_coords_to_int(geom[key])
+    elif isinstance(geom, list):
+        geom = [round_coords_to_int(sub_geom) for sub_geom in geom]
+    elif isinstance(geom, float):
+        geom = int(round(geom))
+    return geom
+
+def save_geojson_with_int_coords(gdf, output_geojson_path):
+    """Save a GeoDataFrame to a GeoJSON file with integer coordinates."""
+    geojson_dict = json.loads(gdf.to_json())
+    
+    for feature in geojson_dict['features']:
+        feature['geometry'] = round_coords_to_int(feature['geometry'])
+    
+    with open(output_geojson_path, 'w') as f:
+        json.dump(geojson_dict, f, separators=(',', ':'))
 
 
 
@@ -94,7 +120,8 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
                 # save
-                clipped_gdf.to_file(output_file, driver="GeoJSON")
+                save_geojson_with_int_coords(clipped_gdf, output_file)
+                #clipped_gdf.to_file(output_file, driver="GeoJSON")
 
 
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:
