@@ -47,8 +47,8 @@
                     source: vectorSource,
                     style: new ol.style.Style({
                         stroke: new ol.style.Stroke({
-                            color: '#ff0000',
-                            width: 2
+                            color: '#000000',
+                            width: 3
                         })
                     })
                 });
@@ -75,12 +75,15 @@
 
 
                 function updateLayer() {
-                    var bbox = map.getView().calculateExtent(map.getSize());
-                    //var bbox = extent //ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
-                    var tiles = getTiles(bbox);
 
+                    //clear
                     vectorSource.clear();
 
+                    //get tiles within viewshed
+                    var bbox = map.getView().calculateExtent(map.getSize());
+                    var tiles = getTiles(bbox);
+
+                    //handle each tile
                     tiles.forEach(tile => {
 
                         //try to retrieve from cache
@@ -120,13 +123,14 @@
                     });
                 }
 
+                //get tiles intersecting the viewshed
                 function getTiles(bbox) {
                     const [xmin, ymin, xmax, ymax] = bbox;
                     const
-                        xtmin = Math.floor((xmin - metadata.origin_x) / metadata.tile_size) - 1,
-                        ytmin = Math.floor((ymin - metadata.origin_y) / metadata.tile_size) - 1,
-                        xtmax = Math.ceil((xmax - metadata.origin_x) / metadata.tile_size) + 1,
-                        ytmax = Math.ceil((ymax - metadata.origin_y) / metadata.tile_size) + 1
+                        xtmin = int((xmin - ox) / ts),
+                        ytmin = int((ymin - oy) / ts),
+                        xtmax = int((xmax - ox) / ts),
+                        ytmax = int((ymax - oy) / ts)
                     var tiles = [];
                     for (var xt = xtmin; xt <= xtmax; xt++) {
                         for (var yt = ytmin; yt <= ytmax; yt++) {
