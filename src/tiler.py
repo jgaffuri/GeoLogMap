@@ -110,4 +110,4 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 
 
 #
-tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 100000, 1000)
+tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiles_100km/", 100000, 1000, -1600000, 4100000)
