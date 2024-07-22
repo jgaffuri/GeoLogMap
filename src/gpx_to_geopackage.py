@@ -26,7 +26,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         end_time = times[-1]
                         traces.append({
                             'geometry': line,
-                            'id_': str(id),
+                            'identifier': str(id),
                             'start_time': str(start_time).replace("+00:00",""),
                             'end_time': str(end_time).replace("+00:00","")
                         })
