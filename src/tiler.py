@@ -15,19 +15,19 @@ def round_coords(geometry, precision=3):
     def _round_coords(coords):
         return tuple(round(coord, precision) for coord in coords)
 
-    if geometry.type == 'Point':
+    if geometry.geom_type == 'Point':
         return type(geometry)(*map(_round_coords, [geometry.coords[0]]))
-    elif geometry.type in ['LineString', 'LinearRing']:
+    elif geometry.geom_type in ['LineString', 'LinearRing']:
         return type(geometry)(list(map(_round_coords, geometry.coords)))
-    elif geometry.type == 'Polygon':
+    elif geometry.geom_type == 'Polygon':
         exterior = list(map(_round_coords, geometry.exterior.coords))
         interiors = [list(map(_round_coords, ring.coords)) for ring in geometry.interiors]
         return type(geometry)(exterior, interiors)
-    elif geometry.type == 'MultiPoint':
+    elif geometry.geom_type == 'MultiPoint':
         return type(geometry)([type(geometry.geoms[0])(list(map(_round_coords, geom.coords))) for geom in geometry.geoms])
-    elif geometry.type == 'MultiLineString':
+    elif geometry.geom_type == 'MultiLineString':
         return type(geometry)([type(geometry.geoms[0])(list(map(_round_coords, geom.coords))) for geom in geometry.geoms])
-    elif geometry.type == 'MultiPolygon':
+    elif geometry.geom_type == 'MultiPolygon':
         return type(geometry)([
             type(geometry.geoms[0])(
                 list(map(_round_coords, geom.exterior.coords)),
@@ -36,7 +36,7 @@ def round_coords(geometry, precision=3):
             for geom in geometry.geoms
         ])
     else:
-        raise ValueError("Unhandled geometry type: {}".format(geometry.type))
+        raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
 
 
 
