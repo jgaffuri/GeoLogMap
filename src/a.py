@@ -7,7 +7,7 @@ tippecanoe -e ../../workspace/GeoLogMap/assets/gps/ -Z 0 -z 15 traces.geojson --
 
 
 
-ogr2ogr -f MBTILES target.mbtiles source.gpkg -dsco MAXZOOM=10
+ogr2ogr -f MBTILES target.mbtiles source.gpkg -dsco MAXZOOM=15
 
 
 
@@ -20,6 +20,8 @@ ogr2ogr -f MBTILES target.mbtiles source.gpkg -dsco MAXZOOM=10
 
 # make gps data vector tiles 
 # Load GPS traces from folder
+
+# https://github.com/mapbox/mbtiles-spec/wiki/Implementations
 
 #MB tiling: https://github.com/mapbox/tippecanoe or TileMill or gdal - specs: https://github.com/mapbox/mbtiles-spec
 # then read it from leaflet with Leaflet.TileLayer.MBTiles
