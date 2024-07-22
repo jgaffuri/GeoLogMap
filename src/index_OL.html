@@ -32,6 +32,17 @@
                     view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 12 })
                 });
 
+                //tile cache
+                const cache = {}
+                function getCacheData(tile) {
+                    if (!cache[tile.x]) return
+                    return cache[tile.x][tile.y]
+                }
+                function insertInCache(tile, features) {
+                    if (!cache[tile.x]) cache[tile.x] = {}
+                    cache[tile.x][tile.y] = features
+                }
+
                 //create vector layer
                 var vectorSource = new ol.source.Vector();
                 var vectorLayer = new ol.layer.Vector({
@@ -45,63 +56,76 @@
                 });
                 map.addLayer(vectorLayer);
 
-                //fetch and transform geojson data
-                function fetchTile(tile) {
-                    const url = `http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`
-                    return fetch(url)
-                        .then(response => response.json())
-                        .then(geojson => {
-                            //
-                            function transformGeoJSONGeometryCoordinates(geometry) {
-                                function transformCoordinates(coordinates) {
-                                    if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
-                                    else {
-                                        const x = coordinates[0], y = coordinates[1]
-                                        //console.log(coordinates)
-                                        //TODO transform
-                                        return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
-                                    }
-                                }
-                                if (geometry && geometry.coordinates)
-                                    geometry.coordinates = transformCoordinates(geometry.coordinates);
-                            }
-
-                            //apply coordinates transformation to features
-                            geojson.features.forEach(feature => {
-                                console.log(feature.geometry)
-                                transformGeoJSONGeometryCoordinates(feature.geometry)
-                                console.log(feature.geometry)
-                            });
-                            return geojson;
-                        });
-                }
 
                 function updateLayer() {
                     var bbox = map.getView().calculateExtent(map.getSize());
                     //var bbox = extent //ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
-                    var tiles = generateGeoJSONUrls(bbox);
+                    var tiles = getTiles(bbox);
 
                     vectorSource.clear();
 
                     tiles.forEach(tile => {
-                        fetchTile(tile)
-                            .then(geojson => {
-                                var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
-                                vectorSource.addFeatures(features);
-                            })
-                            .catch(error => console.error('Error fetching GeoJSON:', error));
+
+                        //try to retrieve from cache
+                        const features = getCacheData(tile)
+
+                        if (features == "failed" || features == "loading") {
+                            //do nothing
+                        } else if (features) {
+                            //add to layer
+                            vectorSource.addFeatures(features);
+                        } else {
+                            //mark as loading
+                            insertInCache(tile, "loading")
+
+                            //launch request
+                            fetch(`http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`)
+                                .then(response => response.json())
+                                .then(geojson => {
+                                    //const geojson = response.json()
+
+                                    //
+                                    function transformGeoJSONGeometryCoordinates(geometry) {
+                                        function transformCoordinates(coordinates) {
+                                            if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
+                                            else {
+                                                const x = coordinates[0], y = coordinates[1]
+                                                //console.log(coordinates)
+                                                //TODO transform
+                                                return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
+                                            }
+                                        }
+                                        if (geometry && geometry.coordinates)
+                                            geometry.coordinates = transformCoordinates(geometry.coordinates);
+                                    }
+
+                                    //apply coordinates transformation to features
+                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry));
+
+                                    //transform into OL feature
+                                    var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
+
+                                    //store in cache
+                                    insertInCache(tile, features)
+
+                                    //add to layer
+                                    vectorSource.addFeatures(features);
+                                })
+                                .catch(error => {
+                                    insertInCache(tile, "failed")
+                                    //console.error('Error fetching GeoJSON tile:', tile.x, tile.y, error)
+                                });
+                        }
                     });
                 }
 
-                function generateGeoJSONUrls(bbox) {
+                function getTiles(bbox) {
                     const [xmin, ymin, xmax, ymax] = bbox;
-
                     const
-                        xtmin = Math.floor((xmin - metadata.origin_x) / metadata.tile_size),
-                        ytmin = Math.floor((ymin - metadata.origin_y) / metadata.tile_size),
-                        xtmax = Math.ceil((xmax - metadata.origin_x) / metadata.tile_size),
-                        ytmax = Math.ceil((ymax - metadata.origin_y) / metadata.tile_size)
-
+                        xtmin = Math.floor((xmin - metadata.origin_x) / metadata.tile_size) - 1,
+                        ytmin = Math.floor((ymin - metadata.origin_y) / metadata.tile_size) - 1,
+                        xtmax = Math.ceil((xmax - metadata.origin_x) / metadata.tile_size) + 1,
+                        ytmax = Math.ceil((ymax - metadata.origin_y) / metadata.tile_size) + 1
                     var tiles = [];
                     for (var xt = xtmin; xt <= xtmax; xt++) {
                         for (var yt = ytmin; yt <= ytmax; yt++) {
