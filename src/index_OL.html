@@ -22,8 +22,8 @@
         fetch('http://127.0.0.1:5500/tiles_100km/metadata.json')
             .then(response => response.json())
             .then(metadata => {
-                console.log(metadata);
 
+                //build map
                 var map = new ol.Map({
                     target: 'map',
                     layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
@@ -43,19 +43,22 @@
                 });
                 map.addLayer(vectorLayer);
 
-
                 //fetch and transform geojson data
-                function fetchGeoJSON(url) {
+                function fetchTile(tile) {
+                    const url = `http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`
                     return fetch(url)
                         .then(response => response.json())
                         .then(geojson => {
-                            console.log(geojson)
-                            /*geojson.features.forEach(feature => {
+                            console.log("Loaded !")
+                            //console.log(geojson)
+                            geojson.features.forEach(feature => {
                                 feature.geometry.coordinates = feature.geometry.coordinates.map(coordinate => {
+                                    console.log(coordinate)
+                                    return coordinate
                                     // Apply your transformation logic here, if any
-                                    return ol.proj.fromLonLat(coordinate);
+                                    //return ol.proj.fromLonLat(coordinate);
                                 });
-                            });*/
+                            });
                             return geojson;
                         });
                 }
@@ -68,15 +71,10 @@
                     vectorSource.clear();
 
                     tiles.forEach(tile => {
-                        const url = `http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`
-                        console.log(url)
-                        fetchGeoJSON(url)
+                        fetchTile(tile)
                             .then(geojson => {
-                                console.log("Loaded !")
-                                /*var features = new ol.format.GeoJSON().readFeatures(geojson, {
-                                    featureProjection: 'EPSG:3857'
-                                });
-                                vectorSource.addFeatures(features);*/
+                                var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
+                                vectorSource.addFeatures(features);
                             })
                             .catch(error => console.error('Error fetching GeoJSON:', error));
                     });
@@ -95,7 +93,7 @@
                     for (var xt = xtmin; xt <= xtmax; xt++) {
                         for (var yt = ytmin; yt <= ytmax; yt++) {
                             //var url = `http://127.0.0.1:5500/tiles_100km/${xt}/${yt}.geojson`
-                            tiles.push({x:xt,y:yt});
+                            tiles.push({ x: xt, y: yt });
                         }
                     }
                     return tiles;
