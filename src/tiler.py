@@ -49,20 +49,21 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
 
 
-def round_coords_to_int(geom):
-    """Recursively round coordinates of a geometry to integers."""
-    if isinstance(geom, dict):
-        if 'coordinates' in geom:
-            geom['coordinates'] = round_coords_to_int(geom['coordinates'])
-        else:
-            for key in geom:
-                geom[key] = round_coords_to_int(geom[key])
-    elif isinstance(geom, list):
-        geom = [round_coords_to_int(sub_geom) for sub_geom in geom]
-    elif isinstance(geom, float):
-        geom = int(round(geom))
-    return geom
 
+def round_geojson_coordinates(geojson):
+    if geojson['type'] == 'Point':
+        geojson['coordinates'] = [int(round(coord)) for coord in geojson['coordinates']] 
+    elif geojson['type'] == 'LineString':
+        geojson['coordinates'] = [[int(round(x)), int(round(y))] for x, y in geojson['coordinates']]
+    elif geojson['type'] == 'Polygon':
+        geojson['coordinates'] = [[[int(round(x)), int(round(y))] for x, y in ring] for ring in geojson['coordinates']]
+    elif geojson['type'] == 'MultiPoint':
+        geojson['coordinates'] = [[int(round(x)), int(round(y))] for x, y in geojson['coordinates']]
+    elif geojson['type'] == 'MultiLineString':
+        geojson['coordinates'] = [[[int(round(x)), int(round(y))] for x, y in line] for line in geojson['coordinates']]
+    elif geojson['type'] == 'MultiPolygon':
+        geojson['coordinates'] = [[[[int(round(x)), int(round(y))] for x, y in ring] for ring in polygon] for polygon in geojson['coordinates']]
+    return geojson
 
 
 
@@ -145,8 +146,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 gjgeom = mapping(geom)
 
                 #int geometry
-                #TODO check
-                gjgeom = round_coords_to_int(gjgeom)
+                gjgeom = round_geojson_coordinates(gjgeom)
 
                 #make geojson feature
                 gjf = { "type":"Feature", "id":str(iid), "properties":{}, "geometry": gjgeom }
