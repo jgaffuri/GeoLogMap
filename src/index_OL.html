@@ -76,10 +76,11 @@
 
 
                 function updateLayer() {
-                    const z___ = map.getView().getZoom()
-                    console.log(z___)
-                    const z = 12
 
+                    //get zoom level
+                    const z = Math.round(map.getView().getZoom())
+
+                    //compute tile size
                     const ts = ts0 / Math.pow(2, z)
 
                     //clear
