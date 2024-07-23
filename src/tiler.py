@@ -88,7 +88,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
     fs = loadFeatures(input_gpkg_path)
     print(len(fs))
 
-    # make spatial index and dictionnary
+    # make spatial index and dictionary
     idx = index.Index()
     feature_dict = {}
     for i,f in enumerate(fs):
