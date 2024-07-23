@@ -134,13 +134,13 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 geom = geom.simplify(0)
                 if geom.is_empty: continue
 
-                # to clean polygons
-                # geom = geom.buffer(0)
-
                 # linemerge
                 try: geom = linemerge(geom)
                 except: pass
                 if geom.is_empty: continue
+
+                # to clean polygons
+                # geom = geom.buffer(0)
 
                 #make geojson geometry
                 gjgeom = mapping(geom)
