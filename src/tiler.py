@@ -191,7 +191,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
 def tile(input_gpkg_path, output_folder,z_min = 1, z_max=10, tile_size_0 = 100000000, res_f = 100, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # tile for all zoom levels
-    for z in range(z_min, z_max):
+    for z in range(z_min, z_max+1):
         print("Tiling - zoom level", z)
         d = math.pow(2, z)
         tile_size = tile_size_0 / d
