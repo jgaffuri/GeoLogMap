@@ -8,6 +8,10 @@ import json
 import math
 #import numpy as np
 
+import sys
+sys.path.append('/home/juju/workspace/pyEx/src/')
+from utils.featureutils import loadFeatures
+
 
 def resolutionise_tile(xmin, ymin, geometry, resolution):
     if geometry.is_empty:
@@ -78,50 +82,52 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
 
-    # Open the input GeoPackage file
-    with fiona.open(input_gpkg_path) as src:
+    # data bounding box
+    src = fiona.open(input_gpkg_path)
+    minx, miny, maxx, maxy = src.bounds
 
-        # data bounding box
-        minx, miny, maxx, maxy = src.bounds
+    # tile
+    mintx = int((minx-origin_x)/tile_size)
+    maxtx = int((maxx-origin_x)/tile_size) +1
+    minty = int((miny-origin_y)/tile_size)
+    maxty = int((maxy-origin_y)/tile_size) +1
 
-        # tile
-        mintx = int((minx-origin_x)/tile_size)
-        maxtx = int((maxx-origin_x)/tile_size) +1
-        minty = int((miny-origin_y)/tile_size)
-        maxty = int((maxy-origin_y)/tile_size) +1
+    # load data
+    print("Load data from", input_gpkg_path)
+    fs = loadFeatures(input_gpkg_path)
+    print(len(fs))
 
-        # load into a GeoDataFrame
-        print("Load data from", input_gpkg_path)
-        gdf = gpd.read_file(input_gpkg_path)
-        print(len(gdf))
+    # load into a GeoDataFrame
+    gdf = gpd.read_file(input_gpkg_path)
+    print(len(gdf))
 
-        for ti in range(mintx, maxtx):
-            for tj in range(minty, maxty):
+    for ti in range(mintx, maxtx):
+        for tj in range(minty, maxty):
 
-                # tile bounds
-                tile_minx = origin_x + ti * tile_size
-                tile_maxx = origin_x + (ti + 1) * tile_size
-                tile_miny = origin_y + tj * tile_size
-                tile_maxy = origin_y + (tj + 1) * tile_size
-                tile_bounds = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
+            # tile bounds
+            tile_minx = origin_x + ti * tile_size
+            tile_maxx = origin_x + (ti + 1) * tile_size
+            tile_miny = origin_y + tj * tile_size
+            tile_maxy = origin_y + (tj + 1) * tile_size
+            tile_bounds = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
 
-                # clip input to tile bounds
-                clipped_gdf = gdf[gdf.intersects(tile_bounds)].copy()
-                clipped_gdf['geometry'] = clipped_gdf['geometry'].intersection(tile_bounds)
+            # clip input to tile bounds
+            clipped_gdf = gdf[gdf.intersects(tile_bounds)].copy()
+            clipped_gdf['geometry'] = clipped_gdf['geometry'].intersection(tile_bounds)
 
-                # skip if empty
-                if(len(clipped_gdf)==0): continue
+            # skip if empty
+            if(len(clipped_gdf)==0): continue
 
-                # round coordinates
-                clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
+            # round coordinates
+            clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
 
-                # output file
-                output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
-                os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            # output file
+            output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-                # save
-                save_geojson_with_int_coords(clipped_gdf, output_file)
-                #clipped_gdf.to_file(output_file, driver="GeoJSON")
+            # save
+            save_geojson_with_int_coords(clipped_gdf, output_file)
+            #clipped_gdf.to_file(output_file, driver="GeoJSON")
 
 
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:

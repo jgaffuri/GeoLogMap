@@ -95,7 +95,6 @@
                             //do nothing
                         } else if (features) {
                             //add cached features to layer
-                            //features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
                             vectorSource.addFeatures(features);
                         } else {
                             //mark as loading
@@ -108,6 +107,7 @@
 
                                     //apply coordinates transformation to features
                                     geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile));
+                                    geojson.features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
 
                                     //transform into OL feature
                                     var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
@@ -116,7 +116,6 @@
                                     insertInCache(tile, features)
 
                                     //add features to layer
-                                    //features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
                                     vectorSource.addFeatures(features);
                                 })
                                 .catch(error => {
