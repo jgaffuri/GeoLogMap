@@ -7,6 +7,8 @@ import geopandas as gpd
 import json
 import math
 #import numpy as np
+from rtree import index
+
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
@@ -67,7 +69,7 @@ def round_coords_to_int(geom):
 def save_geojson_with_int_coords(gdf, output_geojson_path):
     """Save a GeoDataFrame to a GeoJSON file with integer coordinates."""
     geojson_dict = json.loads(gdf.to_json())
-    
+
     for feature in geojson_dict['features']:
         feature['geometry'] = round_coords_to_int(feature['geometry'])
     
@@ -79,31 +81,33 @@ def save_geojson_with_int_coords(gdf, output_geojson_path):
 
 
 def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0):
+
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
 
-    # data bounding box
+    # input data bounding box
     src = fiona.open(input_gpkg_path)
     minx, miny, maxx, maxy = src.bounds
 
-    # tile
+    # tiles range
     mintx = int((minx-origin_x)/tile_size)
     maxtx = int((maxx-origin_x)/tile_size) +1
     minty = int((miny-origin_y)/tile_size)
     maxty = int((maxy-origin_y)/tile_size) +1
 
-    # load data
+    # load input data
     print("Load data from", input_gpkg_path)
     fs = loadFeatures(input_gpkg_path)
     print(len(fs))
 
-    # make spatial index
-    sindex = spatialIndex(fs)
+    # make spatial index and dictionnary
+    idx = index.Index()
+    feature_dict = {}
+    for i,f in enumerate(fs):
+        idx.insert(i, f['geometry'].bounds)
+        feature_dict[i] = f
 
-    # load into a GeoDataFrame
-    #gdf = gpd.read_file(input_gpkg_path)
-    #print(len(gdf))
-
+    # handle tiles
     for ti in range(mintx, maxtx):
         for tj in range(minty, maxty):
 
@@ -112,30 +116,56 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
             tile_maxx = origin_x + (ti + 1) * tile_size
             tile_miny = origin_y + tj * tile_size
             tile_maxy = origin_y + (tj + 1) * tile_size
-            tile_bounds = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
+            tile_bounds = (tile_minx, tile_miny, tile_maxx, tile_maxy)
 
-            #get intersecting traces using index
-            traces = sindex.intersection(tile_bounds)
-            print(len(traces))
-
-            # clip input to tile bounds
-            #clipped_gdf = gdf[gdf.intersects(tile_bounds)].copy()
-            #clipped_gdf['geometry'] = clipped_gdf['geometry'].intersection(tile_bounds)
+            # get intersecting features using index
+            iids = list(idx.intersection(tile_bounds))
 
             # skip if empty
-            if(len(traces)==0): continue
-            #if(len(clipped_gdf)==0): continue
+            if(len(iids)==0): continue
 
-            # round coordinates
-            #clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
+            # handle every feature
+            geojson_dict = {"type":"FeatureCollection", "features": []}
+
+
+#{"type":"FeatureCollection","features":
+# [{"id":"3139","type":"Feature","properties":{"id":"3140","start_time":"2018-06-12 19:10:22","end_time":"2018-06-12 20:57:27"},"geometry":{"type":"LineString","coordinates":[[100,61],[99,61],[45,0],[45,0]]}}]
+
+            for iid in iids:
+                feature = feature_dict[iid]
+
+                #get geometry
+                geom = feature["geometry"]
+                gjgeom = None #TODO
+
+                # intersect geometry
+
+                # resolutionise coordinates
+                #clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
+                #linemerge
+                #int geometry
+                #feature['geometry'] = round_coords_to_int(feature['geometry'])
+
+                #make geojson feature
+                gjf = { "type":"Feature", "id":iid, "properties":{}, "geometry": gjgeom }
+
+                # copy feature properties
+                for prop in feature:
+                    if(prop == "geometry"): continue
+                    gjf["properties"][prop] = feature[prop]
+
+                #add
+                geojson_dict['features'].append(gjf)
 
             # output file
-            #output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
-            #os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
             # save
-            #save_geojson_with_int_coords(clipped_gdf, output_file)
-            #clipped_gdf.to_file(output_file, driver="GeoJSON")
+            with open(output_file, 'w') as f:
+                json.dump(geojson_dict, f, separators=(',', ':'))
+
+
 
 
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:
