@@ -136,7 +136,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 # to clean polygons
                 # geom = geom.buffer(0)
 
-                #TODO linemerge
+                # linemerge
                 try: geom = linemerge(geom)
                 except: pass
                 if geom.is_empty: continue
