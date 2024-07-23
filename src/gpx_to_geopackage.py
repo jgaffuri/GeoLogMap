@@ -27,18 +27,16 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         line = LineString(points)
                         start_time = str(times[0]).replace("+00:00","")
                         end_time = str(times[-1]).replace("+00:00","")
+                        duration = round((datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds())
                         traces.append({
                             'geometry': line,
                             'identifier': str(id),
                             'length_m': round(line.length),
-                            'duration_s': (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds(),
+                            'duration_s': duration,
                             'start_time': start_time,
                             'end_time': end_time
                         })
                         id += 1
-
-                        #print(str(start_time).replace("+00:00",""))
-                        #print(str(end_time).replace("+00:00",""))
 
         except Exception as e:
             print("Error when reading file: "+file)
