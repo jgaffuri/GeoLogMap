@@ -18,8 +18,9 @@
 <body>
     <div id="map" class="map"></div>
     <script>
+        const z = 7
 
-        fetch('http://127.0.0.1:5500/tiles_100km/metadata.json')
+        fetch('http://127.0.0.1:5500/tiled/'+z+'/metadata.json')
             .then(response => response.json())
             .then(metadata => {
 
@@ -99,9 +100,9 @@
                         } else {
                             //mark as loading
                             insertInCache(tile, "loading")
-                            
+
                             //launch request
-                            fetch(`http://127.0.0.1:5500/tiles_100km/${tile.x}/${tile.y}.geojson`)
+                            fetch(`http://127.0.0.1:5500/tiled/${z}/${tile.x}/${tile.y}.geojson`)
                                 .then(response => response.json())
                                 .then(geojson => {
 

@@ -189,7 +189,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 #
 for z in range(4,13):
     print("Tiling - zoom level", z)
-    d = math.pow(2,z)
+    d = math.pow(2, z)
     tile_size = 100000000 / d
     resolution = tile_size/100
     tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/"+str(z)+"/", tile_size, resolution, -9000000, -6000000)
