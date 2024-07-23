@@ -155,6 +155,9 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 #add
                 geojson_dict['features'].append(gjf)
 
+            # no feature
+            if len(geojson_dict['features'])==0: continue
+
             # output file
             output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
             os.makedirs(os.path.dirname(output_file), exist_ok=True)
