@@ -140,7 +140,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 gjgeom = round_coords_to_int(gjgeom)
 
                 #make geojson feature
-                gjf = { "type":"Feature", "id":(iid+""), "properties":{}, "geometry": gjgeom }
+                gjf = { "type":"Feature", "id":str(iid), "properties":{}, "geometry": gjgeom }
 
                 # copy feature properties
                 for prop in feature:
