@@ -1,6 +1,6 @@
 import os
 import fiona
-from shapely.geometry import box #, shape, mapping
+from shapely.geometry import box, mapping #, shape, mapping
 #from shapely.ops import transform
 #from shapely import wkt
 import geopandas as gpd
@@ -66,16 +66,6 @@ def round_coords_to_int(geom):
         geom = int(round(geom))
     return geom
 
-def save_geojson_with_int_coords(gdf, output_geojson_path):
-    """Save a GeoDataFrame to a GeoJSON file with integer coordinates."""
-    geojson_dict = json.loads(gdf.to_json())
-
-    for feature in geojson_dict['features']:
-        feature['geometry'] = round_coords_to_int(feature['geometry'])
-    
-    with open(output_geojson_path, 'w') as f:
-        json.dump(geojson_dict, f, separators=(',', ':'))
-
 
 
 
@@ -117,6 +107,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
             tile_miny = origin_y + tj * tile_size
             tile_maxy = origin_y + (tj + 1) * tile_size
             tile_bounds = (tile_minx, tile_miny, tile_maxx, tile_maxy)
+            tile_bounding_box = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
 
             # get intersecting features using index
             iids = list(idx.intersection(tile_bounds))
@@ -136,15 +127,22 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 
                 #get geometry
                 geom = feature["geometry"]
-                gjgeom = None #TODO
 
                 # intersect geometry
+                geom = geom.intersection(tile_bounding_box)
+                if geom.is_empty: continue
 
                 # resolutionise coordinates
+                geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
                 #clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
-                #linemerge
+
+                #TODO linemerge
+
+                #make geojson geometry
+                gjgeom = mapping(geom)
+
                 #int geometry
-                #feature['geometry'] = round_coords_to_int(feature['geometry'])
+                gjgeom = round_coords_to_int(gjgeom)
 
                 #make geojson feature
                 gjf = { "type":"Feature", "id":iid, "properties":{}, "geometry": gjgeom }
