@@ -68,7 +68,7 @@ def round_geojson_coordinates(geojson):
 
 
 
-def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -186,10 +186,29 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 
 
 
+# for several zoom levels
+# TODO one file per zoom level
+def tile(input_gpkg_path, output_folder,z_min = 1, z_max=10, tile_size_0 = 100000000, res_f = 100, origin_x = 0, origin_y = 0, epsg = "3857"):
+
+    # tile for all zoom levels
+    for z in range(z_min, z_max):
+        print("Tiling - zoom level", z)
+        d = math.pow(2, z)
+        tile_size = tile_size_0 / d
+        resolution = tile_size/res_f
+        tile_z(input_gpkg_path, output_folder+str(z)+"/", tile_size, resolution, -9000000, -6000000)
+
+    # save metadata.json file
+    with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:
+        #
+        metadata = {
+            "origin_x" : origin_x,
+            "origin_y" : origin_y,
+            "tile_size_0" : tile_size_0,
+            "res_f" : res_f
+        }
+        json.dump(metadata, json_file, indent=3)
+
+
 #
-for z in range(4,13):
-    print("Tiling - zoom level", z)
-    d = math.pow(2, z)
-    tile_size = 100000000 / d
-    resolution = tile_size/100
-    tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/"+str(z)+"/", tile_size, resolution, -9000000, -6000000)
+tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/", 4, 5, 100000000, 100000000/100, -9000000, -6000000)
