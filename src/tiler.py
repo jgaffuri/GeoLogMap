@@ -1,18 +1,15 @@
 import os
 import fiona
 from shapely.geometry import box, mapping #, shape, mapping
-#from shapely.ops import transform
-#from shapely import wkt
-import geopandas as gpd
+from shapely.ops import linemerge
 import json
 import math
-#import numpy as np
 from rtree import index
 
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures, spatialIndex
+from utils.featureutils import loadFeatures
 
 
 def resolutionise_tile(xmin, ymin, geometry, resolution):
@@ -70,7 +67,7 @@ def round_coords_to_int(geom):
 
 
 
-def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0):
+def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -116,7 +113,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
             if(len(iids)==0): continue
 
             # handle every feature
-            geojson_dict = {"type":"FeatureCollection", "features": [], "crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::3857"}}}
+            geojson_dict = {"type":"FeatureCollection", "features": [], "crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::"+epsg}}}
 
             for iid in iids:
                 feature = feature_dict[iid]
@@ -137,6 +134,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 gjgeom = mapping(geom)
 
                 #int geometry
+                #TODO check
                 gjgeom = round_coords_to_int(gjgeom)
 
                 #make geojson feature
