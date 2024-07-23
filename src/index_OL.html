@@ -18,7 +18,6 @@
 <body>
     <div id="map" class="map"></div>
     <script>
-        const z = 4
 
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
@@ -33,13 +32,15 @@
 
                 //tile cache
                 const cache = {}
-                function getCacheData(tile) {
-                    if (!cache[tile.x]) return
-                    return cache[tile.x][tile.y]
+                function getCacheData(z, x, y) {
+                    if (!cache[z]) return
+                    if (!cache[z][x]) return
+                    return cache[z][x][y]
                 }
-                function insertInCache(tile, features) {
-                    if (!cache[tile.x]) cache[tile.x] = {}
-                    cache[tile.x][tile.y] = features
+                function insertInCache(z, x, y, data) {
+                    if (!cache[z]) cache[z] = {}
+                    if (!cache[z][x]) cache[z][x] = {}
+                    cache[z][x][y] = data
                 }
 
                 //create vector layer
@@ -57,7 +58,9 @@
 
 
                 //transform geojson geometry coordinate from tile CRS to map CRS
-                const ts = metadata.tile_size_0 / Math.pow(2,z), ox = metadata.origin_x, oy = metadata.origin_y, r = ts / metadata.res_f
+                const z = 12
+                const ts = metadata.tile_size_0 / Math.pow(2, z), ox = metadata.origin_x, oy = metadata.origin_y, r = ts / metadata.res_f
+
                 function transformGeoJSONGeometryCoordinates(geometry, tile) {
                     function transformCoordinates(coordinates) {
                         if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
@@ -82,13 +85,14 @@
                     var bbox = map.getView().calculateExtent(map.getSize());
                     var tiles = getTiles(bbox);
 
-                    //console.log(tiles)
+                    const z___ = map.getView().getZoom()
+                    console.log(z___)
 
                     //handle each tile
                     tiles.forEach(tile => {
 
                         //try to retrieve from cache
-                        const features = getCacheData(tile)
+                        const features = getCacheData(z, tile.x, tile.y)
 
                         if (features == "failed" || features == "loading") {
                             //do nothing
@@ -97,7 +101,7 @@
                             vectorSource.addFeatures(features);
                         } else {
                             //mark as loading
-                            insertInCache(tile, "loading")
+                            insertInCache(z, tile.x, tile.y, "loading")
 
                             //launch request
                             fetch(`http://127.0.0.1:5500/tiled/${z}/${tile.x}/${tile.y}.geojson`)
@@ -112,13 +116,13 @@
                                     var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
 
                                     //store into cache
-                                    insertInCache(tile, features)
+                                    insertInCache(z, tile.x, tile.y, features)
 
                                     //add features to layer
                                     vectorSource.addFeatures(features);
                                 })
                                 .catch(error => {
-                                    insertInCache(tile, "failed")
+                                    insertInCache(z, tile.x, tile.y, "failed")
                                     //console.error('Error fetching GeoJSON tile:', tile.x, tile.y, error)
                                 });
                         }
