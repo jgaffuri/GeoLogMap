@@ -68,7 +68,8 @@ def round_geojson_coordinates(geojson):
 
 
 
-def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile_z(input_gpkg_path, output_folder, tile_size, res_f = 100, origin_x = 0, origin_y = 0, epsg = "3857"):
+    resolution = tile_size/res_f
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -172,7 +173,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
 
 
 
-
+    #TODO remove !
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:
         # 
         metadata = {
@@ -187,7 +188,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
 
 
 # for several zoom levels
-# TODO one file per zoom level
+# TODO one input file per zoom level
 def tile(input_gpkg_path, output_folder,z_min = 1, z_max=10, tile_size_0 = 100000000, res_f = 100, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # tile for all zoom levels
@@ -195,8 +196,7 @@ def tile(input_gpkg_path, output_folder,z_min = 1, z_max=10, tile_size_0 = 10000
         print("Tiling - zoom level", z)
         d = math.pow(2, z)
         tile_size = tile_size_0 / d
-        resolution = tile_size/res_f
-        tile_z(input_gpkg_path, output_folder+str(z)+"/", tile_size, resolution, -9000000, -6000000)
+        tile_z(input_gpkg_path, output_folder+str(z)+"/", tile_size, res_f, -9000000, -6000000)
 
     # save metadata.json file
     with open(os.path.join(output_folder, "metadata.json"), 'w') as json_file:

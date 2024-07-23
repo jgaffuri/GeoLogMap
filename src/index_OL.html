@@ -18,9 +18,9 @@
 <body>
     <div id="map" class="map"></div>
     <script>
-        const z = 7
+        const z = 4
 
-        fetch('http://127.0.0.1:5500/tiled/'+z+'/metadata.json')
+        fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
             .then(metadata => {
 
@@ -56,10 +56,8 @@
                 map.addLayer(vectorLayer);
 
 
-
-
                 //transform geojson geometry coordinate from tile CRS to map CRS
-                const ts = metadata.tile_size, ox = metadata.origin_x, oy = metadata.origin_y, r = metadata.resolution
+                const ts = metadata.tile_size_0 / Math.pow(2,z), ox = metadata.origin_x, oy = metadata.origin_y, r = ts / metadata.res_f
                 function transformGeoJSONGeometryCoordinates(geometry, tile) {
                     function transformCoordinates(coordinates) {
                         if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
