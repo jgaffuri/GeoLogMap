@@ -57,15 +57,15 @@
                 map.addLayer(vectorLayer);
 
                 //read base metadata
-                const ts0 = metadata.tile_size_0, ox = metadata.origin_x, oy = metadata.origin_y, res_f = metadata.res_f
+                const ts0 = metadata.tile_size_0, ox = metadata.origin_x, oy = metadata.origin_y, r0 = metadata.resolution_0
 
                 //transform geojson geometry coordinate from tile CRS to map CRS
-                function transformGeoJSONGeometryCoordinates(geometry, tile, ts) {
+                function transformGeoJSONGeometryCoordinates(geometry, tile, ts, r) {
                     function transformCoordinates(coordinates) {
                         if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
                         else {
                             const x = coordinates[0], y = coordinates[1]
-                            return [ox + tile.x * ts + x * ts / res_f, oy + tile.y * ts + y * ts / res_f];
+                            return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
                         }
                     }
                     //if (geometry && geometry.coordinates)
@@ -81,7 +81,9 @@
                     const z = Math.round(map.getView().getZoom())
 
                     //compute tile size
-                    const ts = ts0 / Math.pow(2, z)
+                    const ddd = Math.pow(2, z)
+                    const ts = ts0 / ddd
+                    const r = r0 / ddd
 
                     //clear
                     vectorSource.clear();
@@ -111,7 +113,7 @@
                                 .then(geojson => {
 
                                     //apply coordinates transformation to features
-                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile, ts));
+                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile, ts, r));
                                     geojson.features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
 
                                     //transform into OL feature
