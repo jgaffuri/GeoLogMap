@@ -192,4 +192,4 @@ for z in range(4,13):
     d = math.pow(2,z)
     tile_size = 100000000 / d
     resolution = tile_size/100
-    tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/"+str(z)+"/", tile_size, resolution)
+    tile("/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/"+str(z)+"/", tile_size, resolution, -9000000, -6000000)
