@@ -10,7 +10,7 @@ import math
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures
+from utils.featureutils import loadFeatures, spatialIndex
 
 
 def resolutionise_tile(xmin, ymin, geometry, resolution):
@@ -97,9 +97,12 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
     fs = loadFeatures(input_gpkg_path)
     print(len(fs))
 
+    # make spatial index
+    sindex = spatialIndex(fs)
+
     # load into a GeoDataFrame
-    gdf = gpd.read_file(input_gpkg_path)
-    print(len(gdf))
+    #gdf = gpd.read_file(input_gpkg_path)
+    #print(len(gdf))
 
     for ti in range(mintx, maxtx):
         for tj in range(minty, maxty):
@@ -111,22 +114,27 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
             tile_maxy = origin_y + (tj + 1) * tile_size
             tile_bounds = box(tile_minx, tile_miny, tile_maxx, tile_maxy)
 
+            #get intersecting traces using index
+            traces = sindex.intersection(tile_bounds)
+            print(len(traces))
+
             # clip input to tile bounds
-            clipped_gdf = gdf[gdf.intersects(tile_bounds)].copy()
-            clipped_gdf['geometry'] = clipped_gdf['geometry'].intersection(tile_bounds)
+            #clipped_gdf = gdf[gdf.intersects(tile_bounds)].copy()
+            #clipped_gdf['geometry'] = clipped_gdf['geometry'].intersection(tile_bounds)
 
             # skip if empty
-            if(len(clipped_gdf)==0): continue
+            if(len(traces)==0): continue
+            #if(len(clipped_gdf)==0): continue
 
             # round coordinates
-            clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
+            #clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
 
             # output file
-            output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            #output_file = os.path.join(output_folder, f"{ti}/{tj}.geojson")
+            #os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
             # save
-            save_geojson_with_int_coords(clipped_gdf, output_file)
+            #save_geojson_with_int_coords(clipped_gdf, output_file)
             #clipped_gdf.to_file(output_file, driver="GeoJSON")
 
 
