@@ -127,8 +127,19 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 
                 # resolutionise coordinates
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
+                if geom.is_empty: continue
+
+                # to remove duplicate points of linear features
+                geom = geom.simplify(0)
+                if geom.is_empty: continue
+
+                # to clean polygons
+                # geom = geom.buffer(0)
 
                 #TODO linemerge
+                try: geom = linemerge(geom)
+                except: pass
+                if geom.is_empty: continue
 
                 #make geojson geometry
                 gjgeom = mapping(geom)
