@@ -56,17 +56,16 @@
                 });
                 map.addLayer(vectorLayer);
 
+                //read base metadata
+                const ts0 = metadata.tile_size_0, ox = metadata.origin_x, oy = metadata.origin_y, res_f = metadata.res_f
 
                 //transform geojson geometry coordinate from tile CRS to map CRS
-                const z = 12
-                const ts = metadata.tile_size_0 / Math.pow(2, z), ox = metadata.origin_x, oy = metadata.origin_y, r = ts / metadata.res_f
-
-                function transformGeoJSONGeometryCoordinates(geometry, tile) {
+                function transformGeoJSONGeometryCoordinates(geometry, tile, ts) {
                     function transformCoordinates(coordinates) {
                         if (Array.isArray(coordinates[0])) return coordinates.map(transformCoordinates);
                         else {
                             const x = coordinates[0], y = coordinates[1]
-                            return [ox + tile.x * ts + x * r, oy + tile.y * ts + y * r];
+                            return [ox + tile.x * ts + x * ts / res_f, oy + tile.y * ts + y * ts / res_f];
                         }
                     }
                     //if (geometry && geometry.coordinates)
@@ -77,16 +76,18 @@
 
 
                 function updateLayer() {
+                    const z___ = map.getView().getZoom()
+                    console.log(z___)
+                    const z = 12
+
+                    const ts = ts0 / Math.pow(2, z)
 
                     //clear
                     vectorSource.clear();
 
                     //get tiles within viewshed
                     var bbox = map.getView().calculateExtent(map.getSize());
-                    var tiles = getTiles(bbox);
-
-                    const z___ = map.getView().getZoom()
-                    console.log(z___)
+                    var tiles = getTiles(bbox, ts);
 
                     //handle each tile
                     tiles.forEach(tile => {
@@ -109,7 +110,7 @@
                                 .then(geojson => {
 
                                     //apply coordinates transformation to features
-                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile));
+                                    geojson.features.forEach(feature => transformGeoJSONGeometryCoordinates(feature.geometry, tile, ts));
                                     geojson.features.forEach(feature => feature.id = Math.round(1e15 * Math.random()))
 
                                     //transform into OL feature
@@ -130,7 +131,7 @@
                 }
 
                 //get tiles intersecting the viewshed
-                function getTiles(bbox) {
+                function getTiles(bbox, ts) {
 
                     const [xmin, ymin, xmax, ymax] = bbox;
 
