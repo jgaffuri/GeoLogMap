@@ -2,11 +2,14 @@ import os
 import geopandas as gpd
 from shapely.geometry import LineString
 import gpxpy
+from datetime import datetime
 
 
 def create_geopackage_from_gpx(folder_path, output_file):
 
     id = 1
+    date_format = "%Y-%m-%d %H:%M:%S"
+
     files = os.listdir(folder_path)
     print(len(files),"files")
 
@@ -22,15 +25,15 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         points = [(point.longitude, point.latitude) for point in segment.points]
                         times = [point.time for point in segment.points]
                         line = LineString(points)
-                        start_time = times[0]
-                        end_time = times[-1]
+                        start_time = str(times[0]).replace("+00:00","")
+                        end_time = str(times[-1]).replace("+00:00","")
                         traces.append({
                             'geometry': line,
                             'identifier': str(id),
                             'length_m': round(line.length),
-                            'duration_s': 0, #TODO
-                            'start_time': str(start_time).replace("+00:00",""),
-                            'end_time': str(end_time).replace("+00:00","")
+                            'duration_s': (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds(),
+                            'start_time': start_time,
+                            'end_time': end_time
                         })
                         id += 1
 
