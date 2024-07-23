@@ -116,11 +116,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
             if(len(iids)==0): continue
 
             # handle every feature
-            geojson_dict = {"type":"FeatureCollection", "features": []}
-
-
-#{"type":"FeatureCollection","features":
-# [{"id":"3139","type":"Feature","properties":{"id":"3140","start_time":"2018-06-12 19:10:22","end_time":"2018-06-12 20:57:27"},"geometry":{"type":"LineString","coordinates":[[100,61],[99,61],[45,0],[45,0]]}}]
+            geojson_dict = {"type":"FeatureCollection", "features": [], "crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::3857"}}}
 
             for iid in iids:
                 feature = feature_dict[iid]
@@ -134,7 +130,6 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
 
                 # resolutionise coordinates
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
-                #clipped_gdf['geometry'] = clipped_gdf['geometry'].apply(lambda geom: resolutionise_tile(tile_minx, tile_miny, geom, resolution))
 
                 #TODO linemerge
 
@@ -145,7 +140,7 @@ def tile(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, or
                 gjgeom = round_coords_to_int(gjgeom)
 
                 #make geojson feature
-                gjf = { "type":"Feature", "id":iid, "properties":{}, "geometry": gjgeom }
+                gjf = { "type":"Feature", "id":(iid+""), "properties":{}, "geometry": gjgeom }
 
                 # copy feature properties
                 for prop in feature:
