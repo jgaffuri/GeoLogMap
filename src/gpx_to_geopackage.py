@@ -45,7 +45,7 @@ def linestring_length_haversine(linestring):
 
 
 
-def create_geopackage_from_gpx(folder_path, output_file):
+def create_geopackage_from_gpx(folder_path, output_file, out_epsg = "3857"):
 
     id = 1
     date_format = "%Y-%m-%d %H:%M:%S"
@@ -54,7 +54,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
     print(len(files),"files")
 
     #
-    projector = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True).transform
+    projector = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:"+out_epsg, always_xy=True).transform
 
     traces = []
     for file in files:
@@ -90,7 +90,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
 
     print(len(traces),"traces loaded")
 
-    gdf = gpd.GeoDataFrame(traces, crs="EPSG:3857")
+    gdf = gpd.GeoDataFrame(traces, crs="EPSG:"+out_epsg)
     gdf.to_file(output_file, layer='gps_traces', driver='GPKG')
 
 
