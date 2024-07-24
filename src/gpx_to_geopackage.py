@@ -1,6 +1,8 @@
 import os
 import geopandas as gpd
-from shapely.geometry import LineString
+from shapely.geometry import Point, LineString, Polygon
+from shapely.ops import transform
+import pyproj
 import gpxpy
 from datetime import datetime
 import math
@@ -42,6 +44,32 @@ def linestring_length_haversine(linestring):
 
 
 
+def transform_geometry(geometry, source_crs, target_crs):
+    """
+    Transforms a Shapely geometry from the source CRS to the target CRS.
+
+    Parameters:
+    - geometry: Shapely geometry object (e.g., Point, LineString, Polygon)
+    - source_crs: The EPSG code or proj string of the source CRS
+    - target_crs: The EPSG code or proj string of the target CRS
+
+    Returns:
+    - Transformed geometry object in the target CRS
+    """
+    # Create a transformer object
+    transformer = pyproj.Transformer.from_crs(source_crs, target_crs, always_xy=True)
+
+    # Define a transformation function using the transformer
+    def transform_function(x, y):
+        return transformer.transform(x, y)
+    
+    # Transform the geometry
+    transformed_geometry = transform(transform_function, geometry)
+    return transformed_geometry
+
+
+
+
 def create_geopackage_from_gpx(folder_path, output_file):
 
     id = 1
@@ -65,8 +93,8 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         start_time = str(times[0]).replace("+00:00","")
                         end_time = str(times[-1]).replace("+00:00","")
                         length_m = round(linestring_length_haversine(line))
-                        print(length_m)
                         duration_s = round((datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds())
+                        line = transform_geometry(line, "EPSG:4326", "EPSG:3857")
                         traces.append({
                             'geometry': line,
                             'identifier': str(id),
