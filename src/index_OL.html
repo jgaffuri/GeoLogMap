@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPS traces</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol/ol.css">
     <script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
@@ -14,12 +14,41 @@
         #map {
             height: 100vh;
             width: 100%;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+        }
+
+        .control-container {
+            position: absolute;
+            top: 60px;
+            /* Adjust to position below zoom buttons */
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            font-family: sans-serif;
         }
     </style>
 </head>
 
 <body>
+
     <div id="map" class="map"></div>
+
+    <div class="control-container">
+        <form id="layer-switcher">
+            <label><input type="radio" name="style" value="default" checked>Traces</label>
+            <br>
+            <label><input type="radio" name="style" value="byspeed">by speed</label>
+            <br>
+            <label><input type="radio" name="style" value="bydate">by date</label>
+        </form>
+    </div>
+
     <script>
 
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
@@ -36,6 +65,17 @@
                     layers: [new ol.layer.Tile({ source: bckgs })],
                     view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
                 });
+
+
+                //radio button change event
+                document.getElementById('layer-switcher').addEventListener('change', updateStyle);
+
+                //
+                function updateStyle() {
+                    const selectedStyle = document.querySelector('input[name="style"]:checked').value
+                    console.log(selectedStyle)
+                }
+
 
                 //tile cache
                 const cache = {}
@@ -67,7 +107,7 @@
                         const timestamp = f.get('start_time')
                         const date = new Date(timestamp);
                         const years = date.getTime() / 31557600000;
-                        const t = (years-ymin)/(ymax-ymin)
+                        const t = (years - ymin) / (ymax - ymin)
                         const color = colorScaleDate(t)
 
                         return new ol.style.Style({
@@ -97,8 +137,6 @@
                     //if (geometry && geometry.coordinates)
                     geometry.coordinates = transformCoordinates(geometry.coordinates);
                 }
-
-
 
 
                 function updateLayer() {
