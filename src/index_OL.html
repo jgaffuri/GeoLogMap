@@ -22,14 +22,24 @@
 
         .control-container {
             position: absolute;
-            top: 60px;
+            top: 75px;
             left: 10px;
             background: white;
-            padding: 10px;
+            padding: 5px;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
             z-index: 1000;
             font-family: sans-serif;
+        }
+
+        .ol-popup {
+            position: absolute;
+            background-color: white;
+            padding: 5px;
+            border: 1px solid black;
+            border-radius: 5px;
+            min-width: 100px;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -37,6 +47,7 @@
 <body>
 
     <div id="map" class="map"></div>
+    <div id="popup" class="ol-popup"></div>
 
     <div class="control-container">
         <form id="layer-switcher">
@@ -65,15 +76,29 @@
                     view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
                 });
 
+                // Popup element
+                const popupElement = document.getElementById('popup');
+
+                // Add click event listener
+                map.on('pointermove', function (evt) {
+                    // Hide the popup initially
+                    popupElement.style.display = 'none';
+
+                    // Get the feature at the clicked point
+                    map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+                        // Set the popup content and position it
+                        popupElement.innerHTML = `<p>${feature.get('start_time')}</p>`;
+                        popupElement.style.left = `${evt.pixel[0]}px`;
+                        popupElement.style.top = `${evt.pixel[1]}px`;
+                        popupElement.style.display = 'block';
+
+                        return true; // Stop the iteration after the first found feature
+                    });
+                });
+
 
                 //radio button change event
-                //document.getElementById('layer-switcher').addEventListener('change', updateStyle);
-
-                /*//
-                function updateStyle() {
-                    const selectedStyle = document.querySelector('input[name="style"]:checked').value
-                    console.log(selectedStyle)
-                }*/
+                document.getElementById('layer-switcher').addEventListener('change', () => updateLayer());
 
                 //default style
                 const styleDefaultFun = function (f) {
