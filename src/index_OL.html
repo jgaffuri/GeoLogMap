@@ -57,9 +57,17 @@
                 var vectorLayer = new ol.layer.Vector({
                     source: vectorSource,
                     style: function (f) {
-                        const sp = f.get('speed_kmh')
+                        //const sp = f.get('speed_kmh')
+                        //const t = sp / 200
 
-                        const color = d3.interpolateSpectral(1 - sp / 200)
+                        const ymin = 39.6, ymax = 51
+                        const timestamp = f.get('start_time')
+                        const date = new Date(timestamp);
+                        const years = date.getTime() / 31557600000;
+                        const t = (years-ymin)/(ymax-ymin)
+
+
+                        const color = d3.interpolateSpectral(1 - t)
                         //interpolateSpectral interpolateTurbo
 
                         return new ol.style.Style({
