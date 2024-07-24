@@ -57,7 +57,9 @@
                 map.addLayer(vectorLayer);
 
                 //read base metadata
-                const ts0 = metadata.tile_size_0, ox = metadata.origin_x, oy = metadata.origin_y, r0 = metadata.resolution_0
+                const ts0 = metadata.tile_size_0, r0 = metadata.resolution_0,
+                    ox = metadata.origin_x, oy = metadata.origin_y,
+                    z_min = metadata.z_min, z_max = metadata.z_max
 
                 //transform geojson geometry coordinate from tile CRS to map CRS
                 function transformGeoJSONGeometryCoordinates(geometry, tile, ts, r) {
