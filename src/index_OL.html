@@ -4,9 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenLayers Vector Tiles Example</title>
+    <title>GPS traces</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/openlayers/dist/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+
     <style>
         #map {
             height: 100vh;
@@ -23,10 +28,14 @@
             .then(response => response.json())
             .then(metadata => {
 
+                //const bckgs = new ol.source.OSM()
+                //const bckgs = new ol.source.XYZ({ url: 'http://{a-c}.tile.stamen.com/toner/{z}/{x}/{y}.png' });
+                const bckgs = new ol.source.XYZ({ url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' })
+
                 //build map
                 var map = new ol.Map({
                     target: 'map',
-                    layers: [new ol.layer.Tile({ source: new ol.source.OSM() })],
+                    layers: [new ol.layer.Tile({ source: bckgs })],
                     view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
                 });
 
@@ -47,12 +56,19 @@
                 var vectorSource = new ol.source.Vector();
                 var vectorLayer = new ol.layer.Vector({
                     source: vectorSource,
-                    style: new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: '#000000',
-                            width: 2
-                        })
-                    })
+                    style: function (f) {
+                        const sp = f.get('speed_kmh')
+
+                        const color = d3.interpolateSpectral(1 - sp / 200)
+                        //interpolateSpectral interpolateTurbo
+
+                        return new ol.style.Style({
+                            stroke: new ol.style.Stroke({
+                                color: color,
+                                width: 2
+                            })
+                        });
+                    }
                 });
                 map.addLayer(vectorLayer);
 
