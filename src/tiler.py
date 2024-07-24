@@ -198,4 +198,4 @@ def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max=10, tile_size_0 = 1
 
 
 #
-tile(lambda z: "/home/juju/geodata/GPS/traces_3857.gpkg", "/home/juju/geodata/GPS/tiled/", 4, 15, 100000000, 300000, -9000000, -6000000)
+tile(lambda z: "/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/tiled/", 4, 15, 100000000, 300000, -9000000, -6000000)
