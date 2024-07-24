@@ -68,7 +68,7 @@ def round_geojson_coordinates(geojson):
 
 
 
-def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, origin_y = 0, simplify_f = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -126,6 +126,12 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
                 geom = geom.intersection(tile_bounding_box)
                 if geom.is_empty: continue
 
+                # TODO move that to simplify ?
+
+                # simplify
+                geom = geom.simplify(simplify_f * resolution)
+                if geom.is_empty: continue
+
                 # resolutionise coordinates
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
                 if geom.is_empty: continue
@@ -141,6 +147,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
 
                 # to clean polygons
                 # geom = geom.buffer(0)
+
 
                 #make geojson geometry
                 gjgeom = mapping(geom)
