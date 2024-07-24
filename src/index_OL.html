@@ -80,8 +80,9 @@
                 function updateLayer() {
 
                     //get zoom level
-                    const z = Math.round(map.getView().getZoom())
-                    console.log(z)
+                    let z = Math.round(map.getView().getZoom())
+                    if (z < z_min) z = z_min; else if (z > z_max) z = z_max
+                    //console.log(z)
 
                     //compute tile size and resolution
                     const ddd = Math.pow(2, z)
