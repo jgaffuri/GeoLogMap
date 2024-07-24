@@ -84,7 +84,7 @@
             .style('visibility', 'hidden')
         const svgSpeed = divLgSpeed.append('svg')
             .attr('width', 300)
-            .attr('height', 30);
+            .attr('height', 55);
         for (let i = 0; i < 300; i++)
             svgSpeed.append('line')
                 .attr('x1', i)
@@ -95,21 +95,28 @@
                 .attr('stroke-width', 1);
         svgSpeed.append('text').attr("x", 0).attr("y", 10).text("Slow").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold")
         svgSpeed.append('text').attr("x", 300).attr("y", 10).text("Fast").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold").style("text-anchor", "end")
+        svgSpeed.append('text').attr("x", 0).attr("y", 50).text("Walk").style("font-family", "Arial").style("font-size", "12")
+        svgSpeed.append('text').attr("x", 40).attr("y", 50).text("Run").style("font-family", "Arial").style("font-size", "12")
+        svgSpeed.append('text').attr("x", 80).attr("y", 50).text("Bike").style("font-family", "Arial").style("font-size", "12")
+        svgSpeed.append('text').attr("x", 180).attr("y", 50).text("Drive").style("font-family", "Arial").style("font-size", "12")
+        svgSpeed.append('text').attr("x", 300).attr("y", 50).text("Fly").style("font-family", "Arial").style("font-size", "12").style("text-anchor", "end")
 
         //legend for date style
         const divLgDate = d3.select('#legendDate')
             .style('visibility', 'hidden')
         const svgDate = divLgDate.append('svg')
             .attr('width', 300)
-            .attr('height', 30);
+            .attr('height', 55);
         for (let i = 0; i < 300; i++)
             svgDate.append('line')
                 .attr('x1', i)
-                .attr('y1', 0)
+                .attr('y1', 15)
                 .attr('x2', i)
-                .attr('y2', 20)
+                .attr('y2', 15 + 20)
                 .attr('stroke', colorScaleDate(i / 300))
                 .attr('stroke-width', 1);
+        svgDate.append('text').attr("x", 0).attr("y", 10).text("Old").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold")
+        svgDate.append('text').attr("x", 300).attr("y", 10).text("New").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold").style("text-anchor", "end")
 
 
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
