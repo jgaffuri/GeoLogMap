@@ -52,29 +52,28 @@
 
                 //color scales
                 const colorScaleSpeed = d3.scaleLinear().domain([0, 0.05, 0.4, 0.75, 0.95, 1]).range(["#4DAF4A", "#4DAF4A", "#377EB8", "#E41A1C", "#FFFF33", "#FFFF33"]);
+                const colorScaleDate = d3.scaleLinear().domain([0, 0.5, 1]).range(["#377EB8", "#FFFF33", "#E41A1C"]);
 
                 //create vector layer
                 var vectorSource = new ol.source.Vector();
                 var vectorLayer = new ol.layer.Vector({
                     source: vectorSource,
                     style: function (f) {
-                        const sp = f.get('speed_kmh')
+                        /*const sp = f.get('speed_kmh')
                         const t = (sp - 5) / 180
-                        const color = colorScaleSpeed(t)
+                        const color = colorScaleSpeed(t)*/
 
-                        /*const ymin = 39.6, ymax = 51
+                        const ymin = 39.6, ymax = 51
                         const timestamp = f.get('start_time')
                         const date = new Date(timestamp);
                         const years = date.getTime() / 31557600000;
-                        const t = (years-ymin)/(ymax-ymin)*/
-
-                        //const color = d3.interpolateSpectral(1 - t)
-                        //interpolateSpectral interpolateTurbo
+                        const t = (years-ymin)/(ymax-ymin)
+                        const color = colorScaleDate(t)
 
                         return new ol.style.Style({
                             stroke: new ol.style.Stroke({
                                 color: color,
-                                width: 2
+                                width: 1.5
                             })
                         });
                     }
