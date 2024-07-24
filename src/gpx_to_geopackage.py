@@ -6,8 +6,8 @@ from datetime import datetime
 import math
 
 
-
 def haversine(coord1, coord2):
+    """Calculate the Haversine distance between two points in meters."""
     # Radius of the Earth in meters
     R = 6371000
     lat1, lon1 = coord1
@@ -30,12 +30,15 @@ def haversine(coord1, coord2):
     
     return distance
 
-def linestring_length(coords):
+def linestring_length_haversine(linestring):
+    """Calculate the length of a Shapely LineString in meters using the Haversine formula."""
     total_length = 0
+    coords = list(linestring.coords)
+    
     for i in range(len(coords) - 1):
         total_length += haversine(coords[i], coords[i + 1])
+    
     return total_length
-
 
 
 
@@ -61,13 +64,14 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         line = LineString(points)
                         start_time = str(times[0]).replace("+00:00","")
                         end_time = str(times[-1]).replace("+00:00","")
-                        duration = round((datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds())
-                        print(round(line.length)) #TODO use formula
+                        length_m = round(linestring_length_haversine(line))
+                        print(length_m)
+                        duration_s = round((datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds())
                         traces.append({
                             'geometry': line,
                             'identifier': str(id),
-                            'length_m': round(line.length),
-                            'duration_s': duration,
+                            'length_m': length_m,
+                            'duration_s': duration_s,
                             'start_time': start_time,
                             'end_time': end_time
                         })
