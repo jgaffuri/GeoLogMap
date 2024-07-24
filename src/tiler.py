@@ -180,7 +180,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size, resolution, origin_x = 0, 
 
 
 # for several zoom levels
-def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max=10, tile_size_0 = 100000000, resolution_0 = 300000, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max=10, tile_size_0 = 100000000, resolution_0 = 300000, origin_x = 0, origin_y = 0, simplify_f = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -202,9 +202,9 @@ def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max=10, tile_size_0 = 1
     for z in range(z_min, z_max+1):
         print("Tiling - zoom level", z)
         d = math.pow(2, z)
-        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size_0 / d, resolution_0 / d, -9000000, -6000000)
+        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size_0 / d, resolution_0 / d, origin_x, origin_y, simplify_f, epsg)
 
 
 
 #
-tile(lambda z: "/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/tiled/", 4, 15, 100000000, 300000, -9000000, -6000000)
+tile(lambda z: "/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/tiled/", 3, 15, 100000000, 250000, -9000000, -6000000, 0.5)
