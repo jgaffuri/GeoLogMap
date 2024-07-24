@@ -1,6 +1,6 @@
 import os
 import geopandas as gpd
-from shapely.geometry import Point, LineString, Polygon
+from shapely.geometry import LineString
 from shapely.ops import transform
 import pyproj
 import gpxpy
@@ -44,31 +44,6 @@ def linestring_length_haversine(linestring):
 
 
 
-def transform_geometry(geometry, source_crs, target_crs):
-    """
-    Transforms a Shapely geometry from the source CRS to the target CRS.
-
-    Parameters:
-    - geometry: Shapely geometry object (e.g., Point, LineString, Polygon)
-    - source_crs: The EPSG code or proj string of the source CRS
-    - target_crs: The EPSG code or proj string of the target CRS
-
-    Returns:
-    - Transformed geometry object in the target CRS
-    """
-    # Create a transformer object
-    transformer = pyproj.Transformer.from_crs(source_crs, target_crs, always_xy=True)
-
-    # Define a transformation function using the transformer
-    def transform_function(x, y):
-        return transformer.transform(x, y)
-    
-    # Transform the geometry
-    transformed_geometry = transform(transform_function, geometry)
-    return transformed_geometry
-
-
-
 
 def create_geopackage_from_gpx(folder_path, output_file):
 
@@ -77,6 +52,9 @@ def create_geopackage_from_gpx(folder_path, output_file):
 
     files = os.listdir(folder_path)
     print(len(files),"files")
+
+    #
+    projector = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True).transform
 
     traces = []
     for file in files:
@@ -94,7 +72,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
                         end_time = str(times[-1]).replace("+00:00","")
                         length_m = round(linestring_length_haversine(line))
                         duration_s = round((datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds())
-                        line = transform_geometry(line, "EPSG:4326", "EPSG:3857")
+                        line = transform(projector, line)
                         traces.append({
                             'geometry': line,
                             'identifier': str(id),
@@ -112,7 +90,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
 
     print(len(traces),"traces loaded")
 
-    gdf = gpd.GeoDataFrame(traces, crs="EPSG:4326")
+    gdf = gpd.GeoDataFrame(traces, crs="EPSG:3857")
     gdf.to_file(output_file, layer='gps_traces', driver='GPKG')
 
 
