@@ -100,6 +100,7 @@ def create_geopackage_from_gpx(folder_path, output_file):
                             'identifier': str(id),
                             'length_m': length_m,
                             'duration_s': duration_s,
+                            "speed_kmh": round(length_m/duration_s * 3.6)
                             'start_time': start_time,
                             'end_time': end_time
                         })
