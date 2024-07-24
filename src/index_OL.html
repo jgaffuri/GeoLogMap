@@ -88,11 +88,13 @@
         for (let i = 0; i < 300; i++)
             svgSpeed.append('line')
                 .attr('x1', i)
-                .attr('y1', 0)
+                .attr('y1', 15)
                 .attr('x2', i)
-                .attr('y2', 20)
+                .attr('y2', 15 + 20)
                 .attr('stroke', colorScaleSpeed(i / 300))
                 .attr('stroke-width', 1);
+        svgSpeed.append('text').attr("x", 0).attr("y", 10).text("Slow").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold")
+        svgSpeed.append('text').attr("x", 300).attr("y", 10).text("Fast").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold").style("text-anchor", "end")
 
         //legend for date style
         const divLgDate = d3.select('#legendDate')
