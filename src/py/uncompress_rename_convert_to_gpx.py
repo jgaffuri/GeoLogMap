@@ -167,5 +167,6 @@ def convert_to_gpx(input_folder, output_folder):
             print(e)
 
 
-rename_files_in_folder()
+#uncompress_gz_files("/home/juju/geodata/GPS/strava_new")
+#rename_files_in_folder("/home/juju/geodata/GPS/strava_new")
 convert_to_gpx("/home/juju/geodata/GPS/traces_brut","/home/juju/geodata/GPS/traces")
