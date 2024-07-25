@@ -118,6 +118,13 @@
         svgDate.append('text').attr("x", 0).attr("y", 10).text("Old").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold")
         svgDate.append('text').attr("x", 300).attr("y", 10).text("New").style("font-family", "Arial").style("font-size", "12").style("font-weight", "bold").style("text-anchor", "end")
 
+        // highlight style
+        const highlightStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: "black",
+                width: 2.5
+            })
+        })
 
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
@@ -140,7 +147,7 @@
                 map.on('pointermove', function (evt) {
                     popupElement.style.display = 'none';
                     map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-                        popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m')/1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s')/60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
+                        popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m') / 1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s') / 60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
                         popupElement.style.left = `${evt.pixel[0] + 7}px`;
                         popupElement.style.top = `${evt.pixel[1] + 7}px`;
                         popupElement.style.display = 'block';
