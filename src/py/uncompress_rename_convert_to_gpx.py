@@ -5,7 +5,7 @@ import pandas as pd
 from lxml import etree
 from fitparse import FitFile, FitParseError
 import shutil
-
+import gzip
 
 
 def get_start_time_from_gpx(file_path):
@@ -148,4 +148,5 @@ def convert_to_gpx(input_folder, output_folder):
             print(e)
 
 
+rename_files_in_folder()
 convert_to_gpx("/home/juju/geodata/GPS/traces_brut","/home/juju/geodata/GPS/traces")
