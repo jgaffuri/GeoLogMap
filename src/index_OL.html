@@ -145,14 +145,33 @@
                 const popupElement = document.getElementById('popup');
                 // pointer move event listener
                 map.on('pointermove', function (evt) {
+                    // hide popup element
                     popupElement.style.display = 'none';
-                    map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+
+                    // get feature under the mouse cursor
+                    const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) { return feature; });
+
+                    //show popup with feature
+                    if(feature) {
                         popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m') / 1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s') / 60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
                         popupElement.style.left = `${evt.pixel[0] + 7}px`;
                         popupElement.style.top = `${evt.pixel[1] + 7}px`;
                         popupElement.style.display = 'block';
-                        return true;
-                    });
+                    }
+
+
+                    /*/ Reset the style of the previously highlighted feature
+                    if (highlightedFeature && highlightedFeature !== feature) {
+                        highlightedFeature.setStyle(defaultStyle);
+                        highlightedFeature = null;
+                    }
+
+                    // Highlight the feature under the mouse cursor
+                    if (feature) {
+                        feature.setStyle(highlightStyle);
+                        highlightedFeature = feature;
+                    }*/
+
                 });
 
 
