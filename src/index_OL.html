@@ -140,7 +140,7 @@
                 map.on('pointermove', function (evt) {
                     popupElement.style.display = 'none';
                     map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-                        popupElement.innerHTML = `<p>Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${feature.get('length_km')/1000}km<br>Duration: ${feature.get('duration_s')/60}min<br>Av speed: ${feature.get('speed_kmh')}km/h</p>`;
+                        popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m')/1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s')/60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
                         popupElement.style.left = `${evt.pixel[0] + 7}px`;
                         popupElement.style.top = `${evt.pixel[1] + 7}px`;
                         popupElement.style.display = 'block';
