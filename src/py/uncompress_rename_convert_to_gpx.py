@@ -8,6 +8,25 @@ import shutil
 import gzip
 
 
+def uncompress_gz_files(folder_path):
+    if not os.path.exists(folder_path):
+        raise FileNotFoundError(f"The folder {folder_path} does not exist.")
+    
+    files = os.listdir(folder_path)
+    gz_files = [file for file in files if file.endswith('.gz')]
+    
+    for gz_file in gz_files:
+        gz_file_path = os.path.join(folder_path, gz_file)
+        uncompressed_file_path = os.path.join(folder_path, gz_file[:-3])
+
+        with gzip.open(gz_file_path, 'rb') as f_in:
+            with open(uncompressed_file_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        os.remove(gz_file_path)
+        print(f"Uncompressed and deleted {gz_file_path}")
+
+
 def get_start_time_from_gpx(file_path):
     with open(file_path, 'r') as gpx_file:
         gpx = gpxpy.parse(gpx_file)
