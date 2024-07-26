@@ -130,55 +130,103 @@
             })
         })
 
+
+        //const bckgs = new ol.source.OSM()
+        //const bckgs = new ol.source.XYZ({ url: 'http://{a-c}.tile.stamen.com/toner/{z}/{x}/{y}.png' });
+        const bckgs = new ol.source.XYZ({ url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' })
+
+        //build map
+        var map = new ol.Map({
+            target: 'map',
+            layers: [new ol.layer.Tile({ source: bckgs })],
+            view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
+        });
+
+
+        //default style
+        const styleDefaultFun = function (f) {
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: "#8400B2",
+                    width: 1
+                })
+            });
+        }
+
+        //speed style
+        const styleSpeedFun = function (f) {
+            const sp = f.get('speed_kmh')
+            const t = (sp - 5) / 180
+            const color = colorScaleSpeed(t)
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: color,
+                    width: 1.5
+                })
+            });
+        }
+
+        //date style
+        const styleDateFun = function (f) {
+            const ymin = 39.6, ymax = 56
+            const timestamp = f.get('start_time')
+            const date = new Date(timestamp);
+            const years = date.getTime() / 31557600000;
+            const t = (years - ymin) / (ymax - ymin)
+            const color = colorScaleDate(t)
+
+            return new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: color,
+                    width: 1.5
+                })
+            });
+        }
+
+
+
+        // popup
+        const popupElement = document.getElementById('popup');
+
+        // Variable to store the currently highlighted feature
+        let highlightedFeature = null;
+
+        // pointer move event listener
+        map.on('pointermove', function (evt) {
+            // hide popup element
+            popupElement.style.display = 'none';
+
+            // get feature under the mouse cursor
+            const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) { return feature; });
+
+            //show popup with feature
+            if (feature) {
+                popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m') / 1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s') / 60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
+                popupElement.style.left = `${evt.pixel[0] + 7}px`;
+                popupElement.style.top = `${evt.pixel[1] + 7}px`;
+                popupElement.style.display = 'block';
+            }
+
+            // Reset the style of the previously highlighted feature
+            if (highlightedFeature && highlightedFeature !== feature) {
+                highlightedFeature.setStyle(null);
+                highlightedFeature = null;
+            }
+            // Highlight the feature under the mouse cursor
+            if (feature) {
+                feature.setStyle(highlightStyle);
+                highlightedFeature = feature;
+            }
+
+        });
+
+
+
+
+
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
             .then(metadata => {
-
-                //const bckgs = new ol.source.OSM()
-                //const bckgs = new ol.source.XYZ({ url: 'http://{a-c}.tile.stamen.com/toner/{z}/{x}/{y}.png' });
-                const bckgs = new ol.source.XYZ({ url: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' })
-
-                //build map
-                var map = new ol.Map({
-                    target: 'map',
-                    layers: [new ol.layer.Tile({ source: bckgs })],
-                    view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
-                });
-
-                // popup
-                const popupElement = document.getElementById('popup');
-
-                // Variable to store the currently highlighted feature
-                let highlightedFeature = null;
-
-                // pointer move event listener
-                map.on('pointermove', function (evt) {
-                    // hide popup element
-                    popupElement.style.display = 'none';
-
-                    // get feature under the mouse cursor
-                    const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) { return feature; });
-
-                    //show popup with feature
-                    if (feature) {
-                        popupElement.innerHTML = `Start: ${feature.get('start_time')}<br>End: ${feature.get('end_time')}<br>Length: ${(feature.get('length_m') / 1000).toFixed(1)} km<br>Duration: ${(feature.get('duration_s') / 60).toFixed(1)} min<br>Av speed: ${(feature.get('speed_kmh'))} km/h`;
-                        popupElement.style.left = `${evt.pixel[0] + 7}px`;
-                        popupElement.style.top = `${evt.pixel[1] + 7}px`;
-                        popupElement.style.display = 'block';
-                    }
-
-                    // Reset the style of the previously highlighted feature
-                    if (highlightedFeature && highlightedFeature !== feature) {
-                        highlightedFeature.setStyle(null);
-                        highlightedFeature = null;
-                    }
-                    // Highlight the feature under the mouse cursor
-                    if (feature) {
-                        feature.setStyle(highlightStyle);
-                        highlightedFeature = feature;
-                    }
-
-                });
 
 
                 //radio button change event
@@ -188,46 +236,6 @@
                     divLgDate.style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
                     updateLayer()
                 });
-
-                //default style
-                const styleDefaultFun = function (f) {
-                    return new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: "#8400B2",
-                            width: 1
-                        })
-                    });
-                }
-
-                //speed style
-                const styleSpeedFun = function (f) {
-                    const sp = f.get('speed_kmh')
-                    const t = (sp - 5) / 180
-                    const color = colorScaleSpeed(t)
-                    return new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: color,
-                            width: 1.5
-                        })
-                    });
-                }
-
-                //date style
-                const styleDateFun = function (f) {
-                    const ymin = 39.6, ymax = 56
-                    const timestamp = f.get('start_time')
-                    const date = new Date(timestamp);
-                    const years = date.getTime() / 31557600000;
-                    const t = (years - ymin) / (ymax - ymin)
-                    const color = colorScaleDate(t)
-
-                    return new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: color,
-                            width: 1.5
-                        })
-                    });
-                }
 
                 //create vector layer
                 var vectorSource = new ol.source.Vector();
