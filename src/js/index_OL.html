@@ -228,7 +228,7 @@
         var vectorSource = new ol.source.Vector();
 
         //zzz
-        makeZZZ = (vectorSource) => {
+        makeZZZ = async (vectorSource) => {
 
             //tile cache
             vectorSource.cache = {}
@@ -242,6 +242,14 @@
                 if (!vectorSource.cache[z][x]) vectorSource.cache[z][x] = {}
                 vectorSource.cache[z][x][y] = data
             }
+
+
+
+          const metadata = await fetch('http://127.0.0.1:5500/tiled/metadata.json')
+            //.then(response => response.json())
+            //.then(metadata => {
+
+
 
         }
         makeZZZ(vectorSource)
