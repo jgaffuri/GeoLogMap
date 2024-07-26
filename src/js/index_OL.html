@@ -226,6 +226,13 @@
 
         //create vector layer
         var vectorSource = new ol.source.Vector();
+
+        //zzz
+        makeZZZ = (vectorSource)=>{
+
+        }
+        makeZZZ(vectorSource)
+
         var vectorLayer = new ol.layer.Vector({ source: vectorSource, style: styleDefaultFun });
         map.addLayer(vectorLayer);
 
@@ -260,16 +267,16 @@
 
 
                 //tile cache
-                const cache = {}
+                vectorSource.cache = {}
                 function getCacheData(z, x, y) {
-                    if (!cache[z]) return
-                    if (!cache[z][x]) return
-                    return cache[z][x][y]
+                    if (!vectorSource.cache[z]) return
+                    if (!vectorSource.cache[z][x]) return
+                    return vectorSource.cache[z][x][y]
                 }
                 function insertInCache(z, x, y, data) {
-                    if (!cache[z]) cache[z] = {}
-                    if (!cache[z][x]) cache[z][x] = {}
-                    cache[z][x][y] = data
+                    if (!vectorSource.cache[z]) vectorSource.cache[z] = {}
+                    if (!vectorSource.cache[z][x]) vectorSource.cache[z][x] = {}
+                    vectorSource.cache[z][x][y] = data
                 }
 
 
