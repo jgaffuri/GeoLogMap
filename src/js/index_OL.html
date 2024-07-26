@@ -229,6 +229,7 @@
 
         //zzz
         makeZZZ = (vectorSource) => {
+
             //tile cache
             vectorSource.cache = {}
             vectorSource.getCacheData = (z, x, y) => {
@@ -241,6 +242,7 @@
                 if (!vectorSource.cache[z][x]) vectorSource.cache[z][x] = {}
                 vectorSource.cache[z][x][y] = data
             }
+
         }
         makeZZZ(vectorSource)
 
@@ -251,30 +253,31 @@
 
 
 
+        //radio button change event
+        document.getElementById('layer-switcher').addEventListener('change', () => {
+            //get selected style
+            const selectedStyle = document.querySelector('input[name="style"]:checked').value
+
+            //set layer style
+            if (selectedStyle == "byspeed") vectorLayer.setStyle(styleSpeedFun)
+            else if (selectedStyle == "bydate") vectorLayer.setStyle(styleDateFun)
+            else vectorLayer.setStyle(styleDefaultFun)
+
+            //show/hide legends
+            divLgSpeed.style('visibility', selectedStyle == "byspeed" ? 'visible' : 'hidden');
+            divLgDate.style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
+
+            //update
+            vectorSource.update___()
+        });
+
+
+
+
+
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
             .then(metadata => {
-
-
-                //radio button change event
-                document.getElementById('layer-switcher').addEventListener('change', () => {
-                    //get selected style
-                    const selectedStyle = document.querySelector('input[name="style"]:checked').value
-
-                    //set layer style
-                    if (selectedStyle == "byspeed") vectorLayer.setStyle(styleSpeedFun)
-                    else if (selectedStyle == "bydate") vectorLayer.setStyle(styleDateFun)
-                    else vectorLayer.setStyle(styleDefaultFun)
-
-                    //show/hide legends
-                    divLgSpeed.style('visibility', selectedStyle == "byspeed" ? 'visible' : 'hidden');
-                    divLgDate.style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
-
-                    //update
-                    updateLayer()
-                });
-
-
 
 
                 //read base metadata
@@ -296,7 +299,7 @@
                 }
 
 
-                function updateLayer() {
+                vectorSource.update___ = () => {
 
                     //get zoom level
                     let z = Math.round(map.getView().getZoom())
@@ -376,10 +379,10 @@
                 }
 
                 //trigger layer refresh on viewshed changes
-                map.getView().on('change:center', updateLayer);
-                map.getView().on('change:resolution', updateLayer);
+                map.getView().on('change:center', vectorSource.update___);
+                map.getView().on('change:resolution', vectorSource.update___);
 
-                updateLayer();
+                vectorSource.update___();
 
             })
             .catch(error => console.error('Error fetching the JSON data:', error));
