@@ -228,8 +228,19 @@
         var vectorSource = new ol.source.Vector();
 
         //zzz
-        makeZZZ = (vectorSource)=>{
-
+        makeZZZ = (vectorSource) => {
+            //tile cache
+            vectorSource.cache = {}
+            vectorSource.getCacheData = (z, x, y) => {
+                if (!vectorSource.cache[z]) return
+                if (!vectorSource.cache[z][x]) return
+                return vectorSource.cache[z][x][y]
+            }
+            vectorSource.insertInCache = (z, x, y, data) => {
+                if (!vectorSource.cache[z]) vectorSource.cache[z] = {}
+                if (!vectorSource.cache[z][x]) vectorSource.cache[z][x] = {}
+                vectorSource.cache[z][x][y] = data
+            }
         }
         makeZZZ(vectorSource)
 
@@ -264,20 +275,6 @@
                 });
 
 
-
-
-                //tile cache
-                vectorSource.cache = {}
-                function getCacheData(z, x, y) {
-                    if (!vectorSource.cache[z]) return
-                    if (!vectorSource.cache[z][x]) return
-                    return vectorSource.cache[z][x][y]
-                }
-                function insertInCache(z, x, y, data) {
-                    if (!vectorSource.cache[z]) vectorSource.cache[z] = {}
-                    if (!vectorSource.cache[z][x]) vectorSource.cache[z][x] = {}
-                    vectorSource.cache[z][x][y] = data
-                }
 
 
                 //read base metadata
@@ -322,7 +319,7 @@
                     tiles.forEach(tile => {
 
                         //try to retrieve from cache
-                        const features = getCacheData(z, tile.x, tile.y)
+                        const features = vectorSource.getCacheData(z, tile.x, tile.y)
 
                         if (features == "failed" || features == "loading") {
                             //do nothing
@@ -331,7 +328,7 @@
                             vectorSource.addFeatures(features);
                         } else {
                             //mark as loading
-                            insertInCache(z, tile.x, tile.y, "loading")
+                            vectorSource.insertInCache(z, tile.x, tile.y, "loading")
 
                             //launch request
                             fetch(`http://127.0.0.1:5500/tiled/${z}/${tile.x}/${tile.y}.geojson`)
@@ -346,13 +343,13 @@
                                     var features = new ol.format.GeoJSON().readFeatures(geojson, { featureProjection: 'EPSG:3857' });
 
                                     //store into cache
-                                    insertInCache(z, tile.x, tile.y, features)
+                                    vectorSource.insertInCache(z, tile.x, tile.y, features)
 
                                     //add features to layer
                                     vectorSource.addFeatures(features);
                                 })
                                 .catch(error => {
-                                    insertInCache(z, tile.x, tile.y, "failed")
+                                    vectorSource.insertInCache(z, tile.x, tile.y, "failed")
                                     //console.error('Error fetching GeoJSON tile:', tile.x, tile.y, error)
                                 });
                         }
