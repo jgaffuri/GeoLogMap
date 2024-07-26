@@ -262,7 +262,7 @@
 
 
                 //read base metadata
-                const ts0 = metadata.tile_size_0, r0 = metadata.resolution_0,
+                const r0 = metadata.resolution_0, ts0 = metadata.tile_size * r0,
                     ox = metadata.origin_x, oy = metadata.origin_y,
                     z_min = metadata.z_min, z_max = metadata.z_max
 

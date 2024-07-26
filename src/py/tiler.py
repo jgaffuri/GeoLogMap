@@ -68,7 +68,7 @@ def round_geojson_coordinates(geojson):
 
 
 
-def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, origin_x = 0, origin_y = 0, simplify_f = 0, epsg = "3857"):
+def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, simplify_f = 0, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # convert tile size from pix to meters
     tile_size *= resolution
@@ -183,7 +183,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, ori
 
 
 # for several zoom levels
-def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max=10, tile_size = 256, resolution_0 = 250000, origin_x = 0, origin_y = 0, simplify_f = 0, epsg = "3857"):
+def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 256, resolution_0 = 250000, simplify_f = 0, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
