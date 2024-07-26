@@ -224,6 +224,23 @@
 
 
 
+        //create vector layer
+        var vectorSource = new ol.source.Vector();
+        var vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+            style: f => {
+                const selectedStyle = document.querySelector('input[name="style"]:checked').value
+                if (selectedStyle == "byspeed") return styleSpeedFun(f)
+                if (selectedStyle == "bydate") return styleDateFun(f)
+                return styleDefaultFun(f)
+            }
+        });
+        map.addLayer(vectorLayer);
+
+
+
+        
+
         fetch('http://127.0.0.1:5500/tiled/metadata.json')
             .then(response => response.json())
             .then(metadata => {
@@ -236,21 +253,6 @@
                     divLgDate.style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
                     updateLayer()
                 });
-
-                //create vector layer
-                var vectorSource = new ol.source.Vector();
-                var vectorLayer = new ol.layer.Vector({
-                    source: vectorSource,
-                    style: f => {
-                        const selectedStyle = document.querySelector('input[name="style"]:checked').value
-                        if (selectedStyle == "byspeed") return styleSpeedFun(f)
-                        if (selectedStyle == "bydate") return styleDateFun(f)
-                        return styleDefaultFun(f)
-                    }
-                });
-                map.addLayer(vectorLayer);
-
-
 
 
 
