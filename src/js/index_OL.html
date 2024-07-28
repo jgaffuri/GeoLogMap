@@ -200,7 +200,7 @@
         const popupElement = document.getElementById('popup');
 
         // variable to store the currently highlighted feature
-        let highlightedFeature = null;
+        let highlightedFeature_id = null;
 
         // pointer move event listener
         map.on('pointermove', function (evt) {
@@ -209,6 +209,9 @@
 
             // get feature under the mouse cursor
             const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) { return feature; });
+            const new_id = feature?.get("identifier")
+
+            console.log(vectorSource.getFeatures())
 
             //show popup with feature
             if (feature) {
@@ -218,15 +221,15 @@
                 popupElement.style.display = 'block';
             }
 
-            // Reset the style of the previously highlighted feature
-            if (highlightedFeature && highlightedFeature !== feature) {
-                highlightedFeature.setStyle(null);
-                highlightedFeature = null;
+            // reset the style of the previously highlighted feature
+            if (highlightedFeature_id && highlightedFeature_id !== feature) {
+                highlightedFeature_id.setStyle(null);
+                highlightedFeature_id = null;
             }
             // Highlight the feature under the mouse cursor
             if (feature) {
                 feature.setStyle(highlightStyle);
-                highlightedFeature = feature;
+                highlightedFeature_id = feature;
             }
 
         });
