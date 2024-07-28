@@ -69,8 +69,16 @@
             <label><input type="radio" name="style" value="bydate">by date</label>
         </form>
     </div>
-    <div id="legendSpeed" class="legend-style"></div>
-    <div id="legendDate" class="legend-style"></div>
+    <div id="speedDiv">
+        <div id="legendSpeed" class="legend-style"></div>
+        <div class="slider-container">
+            <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
+            <div class="value">Value: <span id="sliderValue">50</span></div>
+        </div>
+    </div>
+    <div id="dateDiv">
+        <div id="legendDate" class="legend-style"></div>
+    </div>
 
     <p>Value range: <span id="rangeValue">25 - 75</span></p>
 
@@ -83,8 +91,8 @@
         const colorScaleDate = d3.scaleLinear().domain([0, 0.5, 1]).range(["#377EB8", "#FFFF33", "#E41A1C"]);
 
         //legend for date style
+        d3.select('#speedDiv').style('visibility', 'hidden')
         const divLgSpeed = d3.select('#legendSpeed')
-            .style('visibility', 'hidden')
         const svgSpeed = divLgSpeed.append('svg')
             .attr('width', 300)
             .attr('height', 55);
@@ -105,8 +113,8 @@
         svgSpeed.append('text').attr("x", 300).attr("y", 50).text("Fly").style("font-family", "Arial").style("font-size", "12").style("text-anchor", "end")
 
         //legend for date style
+        d3.select('#dateDiv').style('visibility', 'hidden')
         const divLgDate = d3.select('#legendDate')
-            .style('visibility', 'hidden')
         const svgDate = divLgDate.append('svg')
             .attr('width', 300)
             .attr('height', 55);
