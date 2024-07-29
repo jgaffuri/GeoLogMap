@@ -164,6 +164,7 @@
         const styleSpeedFun = function (f) {
             const sp = f.get('speed_kmh')
 
+            //skip depending on speed range
             const minS = document.getElementById("speedRangeMin").value;
             if (sp < minS) return
             const maxS = document.getElementById("speedRangeMax").value;
