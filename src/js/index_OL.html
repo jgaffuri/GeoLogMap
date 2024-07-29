@@ -193,6 +193,13 @@
             const t = (years - ymin) / (ymax - ymin)
             const color = colorScaleDate(t)
 
+            //skip depending on year range
+            const y = date.getFullYear()
+            const minS = document.getElementById("dateRangeMin").value;
+            if (y < minS) return
+            const maxS = document.getElementById("dateRangeMax").value;
+            if (y > maxS) return
+
             return new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: color,
