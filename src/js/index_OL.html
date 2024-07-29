@@ -81,6 +81,10 @@
     </div>
     <div id="dateDiv" class="legend-style">
         <div><svg id="legendDateSVG" width="300" height="55"></svg></div>
+        <input id="dateRangeMin" type="range" min="2008" max="2024" step="1" value="2008" /><label id="dateRangeMinLbl"
+            for="dateRangeMin">Min: 2008</label><br>
+        <input id="dateRangeMax" type="range" min="2009" max="2025" step="1" value="2025" /><label id="dateRangeMaxLbl"
+            for="dateRangeMax">Max: 2025</label>
     </div>
 
     <div id="popup" class="ol-popup"></div>
@@ -267,16 +271,29 @@
         });
 
 
-        //range sliders
-        document.getElementById('speedRangeMin').addEventListener('input', updateRange)
-        document.getElementById('speedRangeMax').addEventListener('input', updateRange)
+        //range sliders: speed
+        document.getElementById('speedRangeMin').addEventListener('input', updateSpeedRange)
+        document.getElementById('speedRangeMax').addEventListener('input', updateSpeedRange)
+        function updateSpeedRange() {
+            const min = document.getElementById("speedRangeMin").value;
+            const max = document.getElementById("speedRangeMax").value;
 
-        function updateRange() {
-            const minS = document.getElementById("speedRangeMin").value;
-            const maxS = document.getElementById("speedRangeMax").value;
+            document.getElementById("speedRangeMinLbl").innerHTML = "Min: " + min + " km/h";
+            document.getElementById("speedRangeMaxLbl").innerHTML = "Max: " + max + " km/h";
 
-            document.getElementById("speedRangeMinLbl").innerHTML = "Min: " + minS + " km/h";
-            document.getElementById("speedRangeMaxLbl").innerHTML = "Max: " + maxS + " km/h";
+            //update
+            vectorSource.update___()
+        }
+
+        //range sliders: date
+        document.getElementById('dateRangeMin').addEventListener('input', updateDateRange)
+        document.getElementById('dateRangeMax').addEventListener('input', updateDateRange)
+        function updateDateRange() {
+            const min = document.getElementById("dateRangeMin").value;
+            const max = document.getElementById("dateRangeMax").value;
+
+            document.getElementById("dateRangeMinLbl").innerHTML = "Min: " + min;
+            document.getElementById("dateRangeMaxLbl").innerHTML = "Max: " + max;
 
             //update
             vectorSource.update___()
