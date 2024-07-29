@@ -52,6 +52,8 @@
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
             min-width: 100px;
+            z-index: 1000;
+            font-family: sans-serif;
         }
     </style>
 </head>
@@ -69,18 +71,14 @@
             <label><input type="radio" name="style" value="bydate">by date</label>
         </form>
     </div>
-    <div id="speedDiv">
-        <div id="legendSpeed" class="legend-style"></div>
-        <div class="slider-container">
-            <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
-            <div class="value">Value: <span id="sliderValue">50</span></div>
-        </div>
-    </div>
-    <div id="dateDiv">
-        <div id="legendDate" class="legend-style"></div>
-    </div>
 
-    <p>Value range: <span id="rangeValue">25 - 75</span></p>
+    <div id="speedDiv" class="legend-style">
+        <div><svg id="legendSpeedSVG" width="300" height="55"></svg></div>
+        <input type="range" />
+    </div>
+    <div id="dateDiv" class="legend-style">
+        <div id="legendDate"></div>
+    </div>
 
     <div id="popup" class="ol-popup"></div>
 
@@ -92,10 +90,7 @@
 
         //legend for date style
         d3.select('#speedDiv').style('visibility', 'hidden')
-        const divLgSpeed = d3.select('#legendSpeed')
-        const svgSpeed = divLgSpeed.append('svg')
-            .attr('width', 300)
-            .attr('height', 55);
+        const svgSpeed = d3.select('#legendSpeedSVG');
         for (let i = 0; i < 300; i++)
             svgSpeed.append('line')
                 .attr('x1', i)
@@ -256,8 +251,8 @@
             else vectorLayer.setStyle(styleDefaultFun)
 
             //show/hide legends
-            divLgSpeed.style('visibility', selectedStyle == "byspeed" ? 'visible' : 'hidden');
-            divLgDate.style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
+            d3.select('#speedDiv').style('visibility', selectedStyle == "byspeed" ? 'visible' : 'hidden');
+            d3.select('#dateDiv').style('visibility', selectedStyle == "bydate" ? 'visible' : 'hidden');
 
             //update
             vectorSource.update___()
