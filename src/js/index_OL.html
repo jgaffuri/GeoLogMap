@@ -74,7 +74,8 @@
 
     <div id="speedDiv" class="legend-style">
         <div><svg id="legendSpeedSVG" width="300" height="55"></svg></div>
-        <input type="range" />
+        <input id="speedRangeMin" type="range" min="0" max="250" step="1" value="0" /><label id="speedRangeMinLbl" for="speedRangeMin">Min: 0 km/h</label><br>
+        <input id="speedRangeMax" type="range" min="0" max="250" step="1" value="250" /><label for="speedRangeMaxLbl">Max: 250 km/h</label>
     </div>
     <div id="dateDiv" class="legend-style">
         <div><svg id="legendDateSVG" width="300" height="55"></svg></div>
@@ -255,6 +256,21 @@
             //update
             vectorSource.update___()
         });
+
+
+        //range sliders
+        document.getElementById('speedRangeMin').addEventListener('input', updateRange)
+        document.getElementById('speedRangeMax').addEventListener('input', updateRange)
+
+        function updateRange() {
+            const minS = document.getElementById("speedRangeMin").value;
+            const maxS = document.getElementById("speedRangeMax").value;
+
+            document.getElementById("speedRangeMinLbl").innerHTML = "Min: "+minS+" km/h";
+            document.getElementById("speedRangeMaxLbl").innerHTML = "Max: "+maxS+" km/h";
+
+        }
+
 
 
     </script>
