@@ -77,7 +77,7 @@
         <input type="range" />
     </div>
     <div id="dateDiv" class="legend-style">
-        <div id="legendDate"></div>
+        <div><svg id="legendDateSVG" width="300" height="55"></svg></div>
     </div>
 
     <div id="popup" class="ol-popup"></div>
@@ -110,9 +110,7 @@
         //legend for date style
         d3.select('#dateDiv').style('visibility', 'hidden')
         const divLgDate = d3.select('#legendDate')
-        const svgDate = divLgDate.append('svg')
-            .attr('width', 300)
-            .attr('height', 55);
+        const svgDate = d3.select('#legendDateSVG');
         for (let i = 0; i < 300; i++)
             svgDate.append('line')
                 .attr('x1', i)
