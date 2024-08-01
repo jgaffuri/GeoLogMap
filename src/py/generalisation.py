@@ -53,6 +53,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
     fs = loadFeatures(input_gpkg_path)
     print(len(fs))
 
+    fs_out = []
     for f in fs:
         geom = f["geometry"]
 
@@ -63,15 +64,17 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
         geom = resolutionise(geom, resolution)
 
         # linemerge
-        #try:
-        geom = linemerge(geom)
-        #except: pass
-        #if geom.is_empty: continue
+        try:
+            geom = linemerge(geom)
+        except: pass
+        if geom.is_empty: continue
+
+        fs_out.append(f)
 
     print("save as GPKG")
-    schema = get_schema_from_feature(fs[0])
+    schema = get_schema_from_feature(fs_out[0])
     out = fiona.open(output_gpkg_path, 'w', driver='GPKG', crs=CRS.from_epsg(out_epsg), schema=schema)
-    out.writerecords(fs)
+    out.writerecords(fs_out)
 
 
 
