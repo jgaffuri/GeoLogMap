@@ -81,3 +81,4 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
 
 resolution = 1000
 simplify_traces("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_"+str(resolution)+".gpkg", resolution)
+
