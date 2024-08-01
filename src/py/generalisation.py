@@ -1,4 +1,5 @@
 import math
+from shapely.ops import linemerge
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
@@ -42,17 +43,30 @@ def resolutionise(geometry, resolution):
 
 
 
-input_gpkg_path = "/home/juju/geodata/GPS/traces.gpkg"
-res = 1000
 
-# load input data
-print("Load data from", input_gpkg_path)
-fs = loadFeatures(input_gpkg_path)
-print(len(fs))
 
-for f in fs:
+def simplify_traces(input_gpkg_path, output_gpkg_path, resolution):
 
-    # Douglas-Peucker simplification
-    simplified_geom = f["geometry"].simplify(res)
+    # load input data
+    print("Load data from", input_gpkg_path)
+    fs = loadFeatures(input_gpkg_path)
+    print(len(fs))
 
-    #
+    for f in fs:
+        geom = f["geometry"]
+
+        # Douglas-Peucker simplification
+        geom = geom.simplify(resolution)
+
+        #
+        geom = resolutionise(geom, resolution)
+
+        # linemerge
+        #try:
+        geom = linemerge(geom)
+        #except: pass
+        #if geom.is_empty: continue
+
+
+resolution = 1000
+simplify_traces("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_"+str(resolution)+".gpkg", resolution)
