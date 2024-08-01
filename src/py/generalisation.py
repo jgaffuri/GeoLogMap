@@ -71,7 +71,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
 
         fs_out.append(f)
 
-    print("save as GPKG")
+    print("save as GPKG", len(fs_out))
     schema = get_schema_from_feature(fs_out[0])
     out = fiona.open(output_gpkg_path, 'w', driver='GPKG', crs=CRS.from_epsg(out_epsg), schema=schema)
     out.writerecords(fs_out)
