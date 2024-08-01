@@ -1,4 +1,3 @@
-import math
 from shapely.ops import linemerge
 
 import sys
