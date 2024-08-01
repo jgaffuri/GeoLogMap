@@ -13,7 +13,7 @@ def resolutionise(geometry, resolution):
 
 #np.round(coords).astype(int)
     def _reso(x):
-        return int(math.floor(x/resolution))
+        return resolution * math.round(x/resolution)
 
     def _resos(coords):
         return tuple([_reso(coords[0]), _reso(coords[1])])
