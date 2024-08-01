@@ -1,8 +1,10 @@
 from shapely.ops import linemerge
+import fiona
+from fiona.crs import CRS
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures
+from utils.featureutils import loadFeatures, get_schema_from_feature
 
 
 
@@ -44,7 +46,7 @@ def resolutionise(geometry, resolution):
 
 
 
-def simplify_traces(input_gpkg_path, output_gpkg_path, resolution):
+def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3857"):
 
     # load input data
     print("Load data from", input_gpkg_path)
@@ -65,6 +67,13 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution):
         geom = linemerge(geom)
         #except: pass
         #if geom.is_empty: continue
+
+    print("save as GPKG")
+    schema = get_schema_from_feature(fs[0])
+    out = fiona.open(output_gpkg_path, 'w', driver='GPKG', crs=CRS.from_epsg(out_epsg), schema=schema)
+    out.writerecords(fs)
+
+
 
 
 resolution = 1000
