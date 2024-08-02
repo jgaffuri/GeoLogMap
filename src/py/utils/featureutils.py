@@ -1,5 +1,5 @@
 import fiona
-from fiona.crs import from_epsg
+from fiona.crs import CRS
 from shapely.geometry import shape, mapping
 from rtree import index
 
@@ -99,7 +99,7 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
         'w', 
         driver='GPKG',
         schema=schema,
-        crs=from_epsg(crs_epsg)
+        crs = CRS.from_epsg(crs_epsg)
     ) as layer:
         for feature in fs:
             geom = feature.pop('geometry')
