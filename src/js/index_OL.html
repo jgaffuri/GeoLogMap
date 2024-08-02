@@ -134,12 +134,19 @@
         svgDate.append('text').attr("x", 300).attr("y", 50).text("2024").style("font-family", "Arial").style("font-size", "12").style("text-anchor", "end")
 
         // highlight style
-        const highlightStyle = new ol.style.Style({
+        const highlightStyleLine = new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: "red",
                 width: 5
             })
         })
+        const highlightStylePoint = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 3,
+                fill: new ol.style.Fill({ color: '#8400B2' }),
+                stroke: new ol.style.Stroke({ color: 'red', width: 1 })
+            })
+        });
 
 
         //const bckgs = new ol.source.OSM()
@@ -160,9 +167,9 @@
         });
         const defaultPointStyle = new ol.style.Style({
             image: new ol.style.Circle({
-                radius: 5,
-                fill: new ol.style.Fill({ color: 'black' }),
-                stroke: new ol.style.Stroke({ color: 'black', width: 1 })
+                radius: 2.5,
+                fill: new ol.style.Fill({ color: '#8400B2' }),
+                //stroke: new ol.style.Stroke({ color: 'black', width: 1 })
             })
         });
         const styleDefaultFun = function (f) {
@@ -258,7 +265,10 @@
                 for (let f of vectorSource.getFeatures())
                     if (new_id == f.get("identifier")) {
                         highlightedFeatures.push(f)
-                        f.setStyle(highlightStyle);
+                        const t = f.getGeometry().getType()
+                        if (t == "LineString" || t == "MultiLineString") f.setStyle(highlightStyleLine)
+                        else if (t == "Point") f.setStyle(highlightStylePoint)
+                        else console.log(t)
                     }
             }
 
