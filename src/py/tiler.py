@@ -126,7 +126,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, ori
 
     # load input data
     print("Load data from", input_gpkg_path)
-    fs = loadFeatures(input_gpkg_path, layer="linestring")
+    fs = loadFeatures(input_gpkg_path, layer="linestring") + loadFeatures(input_gpkg_path, layer="point")
     print(len(fs))
 
     # make spatial index and dictionary
