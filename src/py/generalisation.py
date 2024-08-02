@@ -4,7 +4,7 @@ from fiona.crs import CRS
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures, get_schema_from_dict_feature
+from utils.featureutils import loadFeatures, save_features_to_gpkg
 
 
 
@@ -72,11 +72,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
         fs_out.append(f)
 
     print("save as GPKG", len(fs_out))
-    schema = get_schema_from_dict_feature(fs_out[0])
-    print(schema)
-    out = fiona.open(output_gpkg_path, 'w', driver='GPKG', crs=CRS.from_epsg(out_epsg), schema=schema)
-    out.writerecords(fs_out)
-
+    save_features_to_gpkg(fs_out, output_gpkg_path, out_epsg)
 
 
 

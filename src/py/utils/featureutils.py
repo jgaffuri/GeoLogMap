@@ -107,3 +107,4 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
                 'geometry': mapping(geom),
                 'properties': feature
             })
+    #TODO: use out.writerecords(fs_out) instead ?
