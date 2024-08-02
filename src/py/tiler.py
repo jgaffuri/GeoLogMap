@@ -46,8 +46,8 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
             )
             for geom in geometry.geoms
         ])
-    elif geometry.geom_type == 'GeometryCollection':
-        return type(geometry)([resolutionise_tile(xmin, ymin, geom, resolution) for geom in geometry.geoms])
+    #elif geometry.geom_type == 'GeometryCollection':
+    #    return type(geometry)([resolutionise_tile(xmin, ymin, geom, resolution) for geom in geometry.geoms])
     else:
         print(geometry)
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
