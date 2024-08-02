@@ -1,6 +1,7 @@
 import os
 import fiona
-from shapely.geometry import box, mapping #, shape, mapping
+from shapely.geometry import box, mapping, LineString, MultiLineString, GeometryCollection
+
 from shapely.ops import linemerge
 import json
 import math
@@ -50,6 +51,40 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
     else:
         print(geometry)
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
+
+
+def extract_linear_components_as_lines(geometry):
+    """
+    Extracts and returns the linear components (LineString or MultiLineString) from a Shapely geometry.
+
+    Parameters:
+    - geometry: A Shapely geometry object which could be a mixture of Points and LineStrings.
+
+    Returns:
+    - A LineString if there's only one linear component, or a MultiLineString if there are multiple.
+    """
+    linear_components = []
+
+    # Handle different geometry types
+    if isinstance(geometry, LineString):
+        linear_components.append(geometry)
+    elif isinstance(geometry, MultiLineString):
+        linear_components.extend(geometry.geoms)
+    elif isinstance(geometry, GeometryCollection):
+        for geom in geometry.geoms:
+            if isinstance(geom, (LineString, MultiLineString)):
+                linear_components.append(geom)
+
+    # Return a single LineString or MultiLineString
+    if len(linear_components) == 0:
+        return None  # No linear components found
+    elif len(linear_components) == 1:
+        return linear_components[0]  # Return the single LineString or MultiLineString directly
+    else:
+        return MultiLineString(linear_components)  # Combine into a MultiLineString
+
+# Example usage:
+# mixed_g
 
 
 
@@ -138,6 +173,10 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, ori
                 #geom = geom.simplify(simplify_f * resolution)
                 #if geom.is_empty: continue
 
+                #
+                if geom.geom_type == "GeometryCollection":
+                    geom = extract_linear_components_as_lines(geom)
+
                 # resolutionise coordinates
                 #print(geom.geom_type)
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
@@ -154,7 +193,6 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, ori
 
                 # to clean polygons
                 # geom = geom.buffer(0)
-
 
                 #make geojson geometry
                 gjgeom = mapping(geom)
