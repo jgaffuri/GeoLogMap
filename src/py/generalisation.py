@@ -70,7 +70,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
         #check point
         if(geom.length <= resolution):
             geom = geom.centroid
-            print(geom)
+            #print(geom)
 
 
         f['geometry'] = geom
