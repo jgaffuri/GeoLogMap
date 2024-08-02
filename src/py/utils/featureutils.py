@@ -1,5 +1,5 @@
 import fiona
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
 from rtree import index
 
 
@@ -38,7 +38,7 @@ def spatialIndex(features):
 
 
 
-def get_schema_from_feature(feature):
+def get_schema_from_geojson_feature(feature):
     """
     Function to extract schema from a feature.
 
@@ -67,4 +67,29 @@ def get_schema_from_feature(feature):
         if prop_type:
             schema['properties'][prop_name] = prop_type
 
+    return schema
+
+
+def get_schema_from_dict_feature(f):
+    geometry_type = mapping(f['geometry'])['type']
+    
+    properties = {}
+    for key, value in f.items():
+        if key == 'geometry':
+            continue
+        if isinstance(value, int):
+            properties[key] = 'int'
+        elif isinstance(value, float):
+            properties[key] = 'float'
+        elif isinstance(value, str):
+            properties[key] = 'str'
+        elif isinstance(value, bool):
+            properties[key] = 'bool'
+        else: print("Unhandled property type for: ", value)
+
+    schema = {
+        'geometry': geometry_type,
+        'properties': properties
+    }
+    
     return schema
