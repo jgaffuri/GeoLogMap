@@ -1,6 +1,7 @@
 # GeoLogMap
-GeoLogMap
 
+Show many GPS traces on a single map.
 
-export and document python lib
+Example: https://jgaffuri.github.io/GeoLogMap/src/js/index_OL.html
+
 
