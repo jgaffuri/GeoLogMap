@@ -225,7 +225,9 @@
 
 
         //define GPS traces layer
-        const vectorSource = getTiledVectorSource("http://127.0.0.1:5500/tiled/")
+        //const url = "http://127.0.0.1:5500/tiled/"
+        const url = "https://raw.githubusercontent.com/jgaffuri/GeoLogMap/main/assets/jg/"
+        const vectorSource = getTiledVectorSource(url)
         var vectorLayer = new ol.layer.Vector({ source: vectorSource, style: styleDefaultFun });
         map.addLayer(vectorLayer);
 
