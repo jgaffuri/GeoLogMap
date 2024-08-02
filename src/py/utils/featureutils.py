@@ -97,63 +97,24 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
         geom_type = feature['geometry'].__class__.__name__
         if geom_type not in features_by_geometry:
             features_by_geometry[geom_type] = []
-        features_by_geometry[geom_type].append(feature)
+
+        geom = feature.pop('geometry')
+        features_by_geometry[geom_type].append({
+                'geometry': mapping(geom),
+                'properties': feature
+            })
 
     #
     for geom_type, features in features_by_geometry.items():
+        print(geom_type, len(features))
+
         # schema
         f0 = features[0]
         schema = {
             'geometry': geom_type,
-            'properties': {k: type(v).__name__ for k, v in f0.items() if k != 'geometry'}
+            'properties': {k: type(v).__name__ for k, v in f0["properties"].items()}
         }
 
         # write features to layer
         with fiona.open(out_gpkg_file, 'w', driver='GPKG', schema=schema, crs = CRS.from_epsg(crs_epsg), layer = geom_type.lower()) as layer:
-            for feature in features:
-                geom = feature.pop('geometry')
-                layer.write({
-                    'geometry': mapping(geom),
-                    'properties': feature
-                })
-
-
-
-
-
-
-
-def save_features_to_gpkg_____(fs, out_gpkg_file, crs_epsg="3035"):
-    """
-    Save a list of features as a GeoPackage file using Fiona.
-
-    Parameters:
-    - fs: List of dictionaries representing the features.
-    - out_gpkg_file: The output file path for the GeoPackage.
-    - crs_epsg: The EPSG code for the coordinate reference system (default is "3035").
-
-    The function is generic to handle varying input feature structures.
-    """
-
-    # Determine the schema dynamically from the first feature
-    first_feature = fs[0]
-    schema = {
-        'geometry': first_feature['geometry'].__class__.__name__,
-        'properties': {k: type(v).__name__ for k, v in first_feature.items() if k != 'geometry'}
-    }
-
-    # Use Fiona to write the features to a GeoPackage
-    with fiona.open(
-        out_gpkg_file, 
-        'w', 
-        driver='GPKG',
-        schema=schema,
-        crs = CRS.from_epsg(crs_epsg)
-    ) as layer:
-        for feature in fs:
-            geom = feature.pop('geometry')
-            layer.write({
-                'geometry': mapping(geom),
-                'properties': feature
-            })
-    #TODO: use out.writerecords(fs_out) instead ?
+            layer.writerecords(features)
