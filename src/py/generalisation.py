@@ -1,6 +1,5 @@
 from shapely.ops import linemerge
-import fiona
-from fiona.crs import CRS
+import math
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
@@ -81,6 +80,19 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
 
 
 
-resolution = 1000
-simplify_traces("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_"+str(resolution)+".gpkg", resolution)
+
+
+def simplify_traces_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, resolution_0 = 250000, iterations=5, out_epsg = "3857"):
+
+
+    for z in range(z_min, z_max+1):
+        print("Generalising - zoom level", z)
+        d = math.pow(2, z)
+        resolution = resolution_0 / d
+        print(resolution)
+        simplify_traces(input_gpkg_path, output_gpkg_path+str(resolution)+".gpkg", resolution, iterations=iterations, out_epsg = out_epsg)
+
+
+
+simplify_traces_z("/home/juju/geodata/GPS/traces_sub.gpkg", "/home/juju/geodata/GPS/traces_sub_", z_min=3, z_max=15, out_epsg = "3857")
 
