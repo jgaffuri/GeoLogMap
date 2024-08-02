@@ -89,10 +89,12 @@ def simplify_traces_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, 
         print("Generalising - zoom level", z)
         d = math.pow(2, z)
         resolution = resolution_0 / d
-        print(resolution)
+        #print(resolution)
         simplify_traces(input_gpkg_path, output_gpkg_path+str(z)+".gpkg", resolution, iterations=iterations, out_epsg = out_epsg)
 
 
 
-simplify_traces_z("/home/juju/geodata/GPS/traces_sub.gpkg", "/home/juju/geodata/GPS/traces_sub_", z_min=3, z_max=15, out_epsg = "3857")
+
+
+simplify_traces_z("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_", z_min=3, z_max=15, out_epsg = "3857")
 
