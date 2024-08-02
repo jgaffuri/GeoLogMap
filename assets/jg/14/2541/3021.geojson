@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","id":"2051","properties":{"identifier":"2068","length_m":10133,"duration_s":719,"speed_kmh":51,"start_time":"2012-02-26 15:24:17","end_time":"2012-02-26 15:36:16"},"geometry":{"type":"LineString","coordinates":[[63,57],[40,52],[34,49],[9,7],[3,0]]}}],"crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:EPSG::3857"}}}
