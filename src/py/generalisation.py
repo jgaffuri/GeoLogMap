@@ -46,7 +46,7 @@ def resolutionise(geometry, resolution):
 
 
 
-def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3857"):
+def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3857", iterations=5):
 
     # load input data
     print("Load data from", input_gpkg_path)
@@ -57,17 +57,21 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
     for f in fs:
         geom = f["geometry"]
 
-        # Douglas-Peucker simplification
-        geom = geom.simplify(resolution)
+        #simplify lines
+        for i in range(iterations):
+            geom = geom.simplify(resolution)
+            geom = resolutionise(geom, resolution)
+            try: geom = linemerge(geom)
+            except: pass
+            if geom.is_empty: break
 
-        #
-        geom = resolutionise(geom, resolution)
-
-        # linemerge
-        try:
-            geom = linemerge(geom)
-        except: pass
         if geom.is_empty: continue
+
+        #check point
+        if(geom.length <= resolution):
+            geom = geom.centroid
+            print(geom)
+
 
         f['geometry'] = geom
         fs_out.append(f)

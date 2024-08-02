@@ -74,7 +74,63 @@ def get_schema_from_geojson_feature(feature):
 
 
 
+
+
+
+
+
 def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
+    """
+    Save a list of features with mixed geometry types (points, lines, etc.) 
+    as a GeoPackage file with separate layers for each geometry type.
+
+    Parameters:
+    - fs: List of dictionaries representing the features.
+    - out_gpkg_file: The output file path for the GeoPackage.
+    - crs_epsg: The EPSG code for the coordinate reference system (default is "3035").
+    """
+    
+    # Create a dictionary to categorize features by their geometry type
+    features_by_geometry = {}
+    
+    for feature in fs:
+        geom_type = feature['geometry'].__class__.__name__
+        if geom_type not in features_by_geometry:
+            features_by_geometry[geom_type] = []
+        features_by_geometry[geom_type].append(feature)
+
+    # Write each geometry type to a separate layer
+    for geom_type, features in features_by_geometry.items():
+        # Determine the schema dynamically from the first feature in the group
+        first_feature = features[0]
+        schema = {
+            'geometry': geom_type,
+            'properties': {k: type(v).__name__ for k, v in first_feature.items() if k != 'geometry'}
+        }
+
+        # Write the features to the corresponding layer
+        with fiona.open(
+            out_gpkg_file, 
+            'w', 
+            driver='GPKG',
+            schema=schema,
+            crs = CRS.from_epsg(crs_epsg),
+            layer=geom_type.lower(),
+        ) as layer:
+            for feature in features:
+                geom = feature.pop('geometry')
+                layer.write({
+                    'geometry': mapping(geom),
+                    'properties': feature
+                })
+
+
+
+
+
+
+
+def save_features_to_gpkg_____(fs, out_gpkg_file, crs_epsg="3035"):
     """
     Save a list of features as a GeoPackage file using Fiona.
 
