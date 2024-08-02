@@ -90,7 +90,7 @@ def simplify_traces_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, 
         d = math.pow(2, z)
         resolution = resolution_0 / d
         print(resolution)
-        simplify_traces(input_gpkg_path, output_gpkg_path+str(resolution)+".gpkg", resolution, iterations=iterations, out_epsg = out_epsg)
+        simplify_traces(input_gpkg_path, output_gpkg_path+str(z)+".gpkg", resolution, iterations=iterations, out_epsg = out_epsg)
 
 
 
