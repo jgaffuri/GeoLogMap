@@ -8,7 +8,7 @@ from rtree import index
 def loadFeatures(file, bbox=None, layer=None):
     features = []
     gpkg = fiona.open(file, 'r')
-    data = list(gpkg.items(bbox=bbox,layer=layer))
+    data = list(gpkg.items(bbox=bbox, layer=layer))
     for d in data:
         d = d[1]
         f = { "geometry": shape(d['geometry']) }
