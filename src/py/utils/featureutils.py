@@ -99,24 +99,17 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
             features_by_geometry[geom_type] = []
         features_by_geometry[geom_type].append(feature)
 
-    # Write each geometry type to a separate layer
+    #
     for geom_type, features in features_by_geometry.items():
-        # Determine the schema dynamically from the first feature in the group
-        first_feature = features[0]
+        # schema
+        f0 = features[0]
         schema = {
             'geometry': geom_type,
-            'properties': {k: type(v).__name__ for k, v in first_feature.items() if k != 'geometry'}
+            'properties': {k: type(v).__name__ for k, v in f0.items() if k != 'geometry'}
         }
 
-        # Write the features to the corresponding layer
-        with fiona.open(
-            out_gpkg_file, 
-            'w', 
-            driver='GPKG',
-            schema=schema,
-            crs = CRS.from_epsg(crs_epsg),
-            layer=geom_type.lower(),
-        ) as layer:
+        # write features to layer
+        with fiona.open(out_gpkg_file, 'w', driver='GPKG', schema=schema, crs = CRS.from_epsg(crs_epsg), layer = geom_type.lower()) as layer:
             for feature in features:
                 geom = feature.pop('geometry')
                 layer.write({
