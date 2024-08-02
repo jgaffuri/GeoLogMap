@@ -155,14 +155,21 @@
 
 
         //default style
+        const defaultLineStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: "#8400B2", width: 1 })
+        });
+        var defaultPointStyle = new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({ color: 'black' }),
+                stroke: new ol.style.Stroke({ color: 'black', width: 1 })
+            })
+        });
         const styleDefaultFun = function (f) {
-            //console.log( f.getGeometry().getType() )
-            return new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: "#8400B2",
-                    width: 1
-                })
-            });
+            const t = f.getGeometry().getType()
+            if (t == "LineString" || t == "MultiLineString") return defaultLineStyle
+            else if (t == "Point") return defaultPointStyle
+            else console.log(t)
         }
 
         //speed style
