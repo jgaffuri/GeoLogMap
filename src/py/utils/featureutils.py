@@ -5,10 +5,11 @@ from rtree import index
 
 
 #load features from a file, as a list of features - each feature is a simple dictionnary
-def loadFeatures(file, bbox=None, layer=None):
+def load_features(file, bbox=None, layer=None):
     features = []
-    gpkg = fiona.open(file, 'r')
-    data = list(gpkg.items(bbox=bbox, layer=layer))
+
+    gpkg = fiona.open(file, 'r', bbox=bbox, layer=layer)
+    data = list(gpkg.items())
     for d in data:
         d = d[1]
         f = { "geometry": shape(d['geometry']) }
@@ -19,7 +20,7 @@ def loadFeatures(file, bbox=None, layer=None):
 
 
 #remove all properties of the feature/dictionnary, except the geometry
-def keepOnlyGeometry(feature):
+def keep_only_geometry(feature):
     for attribute in list(feature.keys()):
         if attribute != 'geometry':
             #feature.pop(attribute)
@@ -31,7 +32,7 @@ def keep_attributes(feature, attributes_to_keep):
         del feature[att]
 
 #make features spatial index
-def spatialIndex(features):
+def spatial_index(features):
     sindex = index.Index()
     for i,f in enumerate(features): sindex.insert(i, f['geometry'].bounds)
     return sindex

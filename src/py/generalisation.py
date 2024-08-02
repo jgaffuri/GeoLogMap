@@ -3,7 +3,7 @@ import math
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures, save_features_to_gpkg
+from utils.featureutils import load_features, save_features_to_gpkg
 
 
 
@@ -49,7 +49,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
 
     # load input data
     print("Load data from", input_gpkg_path)
-    fs = loadFeatures(input_gpkg_path)
+    fs = load_features(input_gpkg_path)
     print(len(fs))
 
     fs_out = []

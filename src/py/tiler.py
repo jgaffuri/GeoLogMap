@@ -10,7 +10,7 @@ from rtree import index
 
 import sys
 sys.path.append('/home/juju/workspace/pyEx/src/')
-from utils.featureutils import loadFeatures
+from utils.featureutils import load_features
 
 
 def resolutionise_tile(xmin, ymin, geometry, resolution):
@@ -126,8 +126,10 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, ori
 
     # load input data
     print("Load data from", input_gpkg_path)
-    fs = loadFeatures(input_gpkg_path, layer="linestring") + loadFeatures(input_gpkg_path, layer="point")
-    print(len(fs))
+    fs1 = load_features(input_gpkg_path, layer="linestring")
+    fs2 = load_features(input_gpkg_path, layer="point")
+    fs = fs1 + fs2
+    print(len(fs), len(fs1), len(fs2))
 
     # make spatial index and dictionary
     idx = index.Index()
