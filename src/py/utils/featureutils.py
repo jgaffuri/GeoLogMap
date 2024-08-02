@@ -89,26 +89,29 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
     - out_gpkg_file: The output file path for the GeoPackage.
     - crs_epsg: The EPSG code for the coordinate reference system (default is "3035").
     """
-    
-    # Create a dictionary to categorize features by their geometry type
-    features_by_geometry = {}
-    
-    for feature in fs:
-        geom_type = feature['geometry'].__class__.__name__
-        if geom_type not in features_by_geometry:
-            features_by_geometry[geom_type] = []
 
+    # index features by geometry type
+    features_by_geometry = {}
+    for feature in fs:
+        #get geometry type
+        geom_type = feature['geometry'].__class__.__name__
+
+        #prepare index
+        if geom_type not in features_by_geometry: features_by_geometry[geom_type] = []
+
+        #add feature, structured to be saved
         geom = feature.pop('geometry')
         features_by_geometry[geom_type].append({
                 'geometry': mapping(geom),
                 'properties': feature
             })
 
-    #
+    # save as gpkg, one layer per geometry type
+    crs = CRS.from_epsg(crs_epsg)
     for geom_type, features in features_by_geometry.items():
-        print(geom_type, len(features))
+        #print(geom_type, len(features))
 
-        # schema
+        # make schema from first feature
         f0 = features[0]
         schema = {
             'geometry': geom_type,
@@ -116,5 +119,6 @@ def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
         }
 
         # write features to layer
-        with fiona.open(out_gpkg_file, 'w', driver='GPKG', schema=schema, crs = CRS.from_epsg(crs_epsg), layer = geom_type.lower()) as layer:
+        with fiona.open(out_gpkg_file, 'w', driver='GPKG', schema=schema, crs = crs, layer = geom_type.lower()) as layer:
             layer.writerecords(features)
+
