@@ -71,9 +71,6 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
             geom = geom.centroid
             #print(geom)
 
-        if geom.geom_type == "GeometryCollection":
-            print(geom)
-
         f['geometry'] = geom
         fs_out.append(f)
 

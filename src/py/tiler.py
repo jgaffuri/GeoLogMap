@@ -45,6 +45,8 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
             )
             for geom in geometry.geoms
         ])
+    elif geometry.geom_type == 'GeometryCollection':
+        return type(geometry)([resolutionise_tile(xmin, ymin, geom, resolution) for geom in geometry.geoms])
     else:
         print(geometry)
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
@@ -69,7 +71,7 @@ def round_geojson_coordinates(geojson):
 
 
 
-def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, simplify_f = 0, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # convert tile size from pix to meters
     tile_size *= resolution
@@ -137,6 +139,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, sim
                 #if geom.is_empty: continue
 
                 # resolutionise coordinates
+                #print(geom.geom_type)
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
                 if geom.is_empty: continue
 
@@ -184,7 +187,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, sim
 
 
 # for several zoom levels
-def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 256, resolution_0 = 250000, simplify_f = 0, origin_x = 0, origin_y = 0, epsg = "3857"):
+def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 256, resolution_0 = 250000, origin_x = 0, origin_y = 0, epsg = "3857"):
 
     # create output folder
     os.makedirs(output_folder, exist_ok=True)
@@ -206,9 +209,9 @@ def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 2
     for z in range(z_min, z_max+1):
         print("Tiling - zoom level", z)
         d = math.pow(2, z)
-        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size, resolution_0 / d, simplify_f, origin_x, origin_y, epsg)
+        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size, resolution_0 / d, origin_x, origin_y, epsg)
 
 
 
 #
-tile(lambda z: "/home/juju/geodata/GPS/traces_"+str(z)+".gpkg", "/home/juju/geodata/GPS/tiled/", z_min=3, z_max=15, origin_x=-9000000, origin_y=-6000000, simplify_f=0.5)
+tile(lambda z: "/home/juju/geodata/GPS/traces_"+str(z)+".gpkg", "/home/juju/geodata/GPS/tiled/", z_min=3, z_max=15, origin_x=-9000000, origin_y=-6000000)
