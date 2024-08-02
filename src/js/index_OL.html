@@ -157,7 +157,7 @@
         var map = new ol.Map({
             target: 'map',
             layers: [new ol.layer.Tile({ source: bckgs })],
-            view: new ol.View({ center: ol.proj.fromLonLat([5.3698, 43.2965]), zoom: 13 })
+            view: new ol.View({ center: ol.proj.fromLonLat([5.3, 47]), zoom: 6 })
         });
 
 
@@ -225,8 +225,8 @@
 
 
         //define GPS traces layer
-        //const url = "http://127.0.0.1:5500/tiled/"
-        const url = "https://raw.githubusercontent.com/jgaffuri/GeoLogMap/main/assets/jg/"
+        const url = "http://127.0.0.1:5500/tiled/"
+        //const url = "https://raw.githubusercontent.com/jgaffuri/GeoLogMap/main/assets/jg/"
         const vectorSource = getTiledVectorSource(url)
         var vectorLayer = new ol.layer.Vector({ source: vectorSource, style: styleDefaultFun });
         map.addLayer(vectorLayer);
