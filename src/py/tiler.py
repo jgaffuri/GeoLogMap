@@ -88,7 +88,7 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, sim
 
     # load input data
     print("Load data from", input_gpkg_path)
-    fs = loadFeatures(input_gpkg_path)
+    fs = loadFeatures(input_gpkg_path, layer="linestring")
     print(len(fs))
 
     # make spatial index and dictionary
@@ -205,9 +205,9 @@ def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 2
     for z in range(z_min, z_max+1):
         print("Tiling - zoom level", z)
         d = math.pow(2, z)
-        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size, resolution_0 / d, origin_x, origin_y, simplify_f, epsg)
+        tile_z(input_gpkg_path_fun(z), output_folder+str(z)+"/", tile_size, resolution_0 / d, simplify_f, origin_x, origin_y, epsg)
 
 
 
 #
-tile(lambda z: "/home/juju/geodata/GPS/trace_"+str(z)+".gpkg", "/home/juju/geodata/GPS/tiled/", z_min=3, z_max=15, origin_x=-9000000, origin_y=-6000000, simplify_f=0.5)
+tile(lambda z: "/home/juju/geodata/GPS/traces_"+str(z)+".gpkg", "/home/juju/geodata/GPS/tiled/", z_min=3, z_max=15, origin_x=-9000000, origin_y=-6000000, simplify_f=0.5)
