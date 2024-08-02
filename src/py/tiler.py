@@ -46,6 +46,7 @@ def resolutionise_tile(xmin, ymin, geometry, resolution):
             for geom in geometry.geoms
         ])
     else:
+        print(geometry)
         raise ValueError("Unhandled geometry type: {}".format(geometry.geom_type))
 
 
@@ -132,21 +133,21 @@ def tile_z(input_gpkg_path, output_folder, tile_size=256, resolution=250000, sim
                 # TODO move that to simplify ?
 
                 # simplify
-                geom = geom.simplify(simplify_f * resolution)
-                if geom.is_empty: continue
+                #geom = geom.simplify(simplify_f * resolution)
+                #if geom.is_empty: continue
 
                 # resolutionise coordinates
                 geom = resolutionise_tile(tile_minx, tile_miny, geom, resolution)
                 if geom.is_empty: continue
 
                 # to remove duplicate points of linear features
-                geom = geom.simplify(0)
-                if geom.is_empty: continue
+                #geom = geom.simplify(0)
+                #if geom.is_empty: continue
 
                 # linemerge
-                try: geom = linemerge(geom)
-                except: pass
-                if geom.is_empty: continue
+                #try: geom = linemerge(geom)
+                #except: pass
+                #if geom.is_empty: continue
 
                 # to clean polygons
                 # geom = geom.buffer(0)
