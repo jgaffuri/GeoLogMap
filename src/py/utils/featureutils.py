@@ -1,4 +1,5 @@
 import fiona
+from fiona.crs import from_epsg
 from shapely.geometry import shape, mapping
 from rtree import index
 
@@ -62,6 +63,8 @@ def get_schema_from_geojson_feature(feature):
             prop_type = 'int'
         elif isinstance(prop_value, float):
             prop_type = 'float'
+        elif isinstance(prop_value, bool):
+            prop_type = 'bool'
         else: print("Unhandled property type for: ", prop_value)
 
         if prop_type:
@@ -70,26 +73,37 @@ def get_schema_from_geojson_feature(feature):
     return schema
 
 
-def get_schema_from_dict_feature(f):
-    geometry_type = mapping(f['geometry'])['type']
-    
-    properties = {}
-    for key, value in f.items():
-        if key == 'geometry':
-            continue
-        if isinstance(value, int):
-            properties[key] = 'int'
-        elif isinstance(value, float):
-            properties[key] = 'float'
-        elif isinstance(value, str):
-            properties[key] = 'str'
-        elif isinstance(value, bool):
-            properties[key] = 'bool'
-        else: print("Unhandled property type for: ", value)
 
+def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
+    """
+    Save a list of features as a GeoPackage file using Fiona.
+
+    Parameters:
+    - fs: List of dictionaries representing the features.
+    - out_gpkg_file: The output file path for the GeoPackage.
+    - crs_epsg: The EPSG code for the coordinate reference system (default is "3035").
+
+    The function is generic to handle varying input feature structures.
+    """
+
+    # Determine the schema dynamically from the first feature
+    first_feature = fs[0]
     schema = {
-        'geometry': geometry_type,
-        'properties': properties
+        'geometry': first_feature['geometry'].__class__.__name__,
+        'properties': {k: type(v).__name__ for k, v in first_feature.items() if k != 'geometry'}
     }
-    
-    return schema
+
+    # Use Fiona to write the features to a GeoPackage
+    with fiona.open(
+        out_gpkg_file, 
+        'w', 
+        driver='GPKG',
+        schema=schema,
+        crs=from_epsg(crs_epsg)
+    ) as layer:
+        for feature in fs:
+            geom = feature.pop('geometry')
+            layer.write({
+                'geometry': mapping(geom),
+                'properties': feature
+            })
