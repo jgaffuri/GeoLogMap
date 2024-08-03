@@ -131,6 +131,7 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                         end_time = times[-1]
                         duration = (end_time - start_time).total_seconds()
                         distance = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
+                        speed = (distance / 1000) / (duration / 3600) if duration > 0 else 0
                         
                         # Create a LineString geometry
                         line = LineString(coords)
@@ -141,7 +142,8 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                             'start_time': start_time,
                             'end_time': end_time,
                             'duration': duration,
-                            'distance': distance
+                            'distance': distance,
+                            'speed': speed
                         })
     
     # Convert to GeoDataFrame in the original CRS (EPSG:4326)
@@ -158,4 +160,5 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
 
 
 
-create_geopackage_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces.gpkg")
+create_geopackage_segments_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces_segments.gpkg")
+#create_geopackage_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces.gpkg")
