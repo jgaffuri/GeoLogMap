@@ -139,11 +139,9 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                             t1 = p1.time
                             start_time = str(t0).replace("+00:00","")
                             end_time = str(t1).replace("+00:00","")
-                            duration_s = (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
-
-                            length_m = 0 #TODO
-                            speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
-
+                            duration_ms = 1000*(datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
+                            length_m = haversine_distance([p0.longitude, p0.latitude],[p1.longitude, p1.latitude])
+                            speed = 3600 * length_m / duration_ms if duration_ms > 0 else 0
                             line = LineString([(point.longitude, point.latitude) for point in [p0,p1]])
 
                             # Store segment data
@@ -152,7 +150,7 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                                 'identifier': str(id),
                                 'start_time': str(start_time).replace("+00:00",""),
                                 'end_time': str(end_time).replace("+00:00",""),
-                                'duration_s': round(duration_s),
+                                'duration_ms': round(duration_ms),
                                 'length_m': round(length_m),
                                 'speed': round(speed)
                             })
