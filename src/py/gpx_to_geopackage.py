@@ -60,7 +60,7 @@ def create_geopackage_from_gpx(folder_path, output_file, out_epsg = "3857"):
     files = os.listdir(folder_path)
     print(len(files),"files")
 
-    #
+    # TODO use gdf.to_crs instead ?
     projector = pyproj.Transformer.from_crs("EPSG:4326", "EPSG:"+out_epsg, always_xy=True).transform
 
     traces = []
@@ -156,18 +156,16 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                             'speed': round(speed)
                         })
                         id+=1
-        except:
-            print("Failed handling gpx file", file)
 
-    # Convert to GeoDataFrame in the original CRS (EPSG:4326)
+        except Exception as e:
+            print("Error when reading file: "+file)
+            print(e)
+
+    print(len(segments_data),"segments loaded")
+
     gdf = gpd.GeoDataFrame(segments_data, crs="EPSG:4326")
-    
-    # Reproject to the specified CRS
     gdf = gdf.to_crs(epsg=int(out_epsg))
-    
-    # Save to GeoPackage
-    gdf.to_file(output_file, driver="GPKG", layer="gpx_segments")
-
+    gdf.to_file(output_file, layer='gps_segments', driver='GPKG')
 
 
 
