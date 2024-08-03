@@ -105,12 +105,17 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
     """Convert GPX files in a folder to a GeoPackage containing segments with attributes."""
 
     segments_data = []
+    id = 1
 
     # Iterate over all GPX files in the folder
     for filename in os.listdir(folder_path):
-        if filename.endswith(".gpx"):
-            gpx_path = os.path.join(folder_path, filename)
-            
+        if not filename.endswith(".gpx"): continue
+
+        gpx_path = os.path.join(folder_path, filename)
+        #print(gpx_path)
+
+        try:
+
             # Parse the GPX file
             with open(gpx_path, 'r') as gpx_file:
                 gpx = gpxpy.parse(gpx_file)
@@ -129,23 +134,27 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                         # Calculate segment attributes
                         start_time = times[0]
                         end_time = times[-1]
-                        duration = (end_time - start_time).total_seconds()
-                        distance = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
-                        speed = (distance / 1000) / (duration / 3600) if duration > 0 else 0
-                        
+                        duration_s = (end_time - start_time).total_seconds()
+                        length_m = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
+                        speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
+
                         # Create a LineString geometry
                         line = LineString(coords)
                         
                         # Store segment data
                         segments_data.append({
                             'geometry': line,
-                            'start_time': start_time,
-                            'end_time': end_time,
-                            'duration': duration,
-                            'distance': distance,
-                            'speed': speed
+                            'identifier': str(id),
+                            'start_time': str(start_time).replace("+00:00",""),
+                            'end_time': str(end_time).replace("+00:00",""),
+                            'duration_s': round(duration_s),
+                            'length_m': round(length_m),
+                            'speed': round(speed)
                         })
-    
+                        id+=1
+        except:
+            print("Failed handling gpx file", filename)
+
     # Convert to GeoDataFrame in the original CRS (EPSG:4326)
     gdf = gpd.GeoDataFrame(segments_data, crs="EPSG:4326")
     
