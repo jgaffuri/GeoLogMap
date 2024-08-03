@@ -78,12 +78,7 @@ def simplify_traces(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3
     save_features_to_gpkg(fs_out, output_gpkg_path, out_epsg)
 
 
-
-
-
 def simplify_traces_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, resolution_0 = 250000, iterations=5, out_epsg = "3857"):
-
-
     for z in range(z_min, z_max+1):
         print("Generalising - zoom level", z)
         d = math.pow(2, z)
@@ -95,5 +90,56 @@ def simplify_traces_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, 
 
 
 
-simplify_traces_z("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_", z_min=3, z_max=15, out_epsg = "3857")
+
+
+
+
+
+
+
+def simplify_traces_segments(input_gpkg_path, output_gpkg_path, resolution, out_epsg = "3857"):
+
+    # load input data
+    print("Load data from", input_gpkg_path)
+    fs = load_features(input_gpkg_path)
+    print(len(fs))
+
+    fs_out = []
+    for f in fs:
+        geom = f["geometry"]
+
+        geom = resolutionise(geom, resolution)
+
+        if geom.is_empty: continue
+
+        #check point
+        if(geom.length == 0): continue
+
+        f['geometry'] = geom
+        fs_out.append(f)
+
+    print("save as GPKG", len(fs_out))
+    save_features_to_gpkg(fs_out, output_gpkg_path, out_epsg)
+
+
+
+
+
+def simplify_traces_segments_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_max = 10, resolution_0 = 250000, out_epsg = "3857"):
+    for z in range(z_min, z_max+1):
+        print("Generalising - zoom level", z)
+        d = math.pow(2, z)
+        resolution = resolution_0 / d
+        #print(resolution)
+        simplify_traces_segments(input_gpkg_path, output_gpkg_path+str(z)+".gpkg", resolution, out_epsg = out_epsg)
+
+
+
+
+
+
+
+
+#simplify_traces_z("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_", z_min=3, z_max=15, out_epsg = "3857")
+simplify_traces_segments_z("/home/juju/geodata/GPS/traces_segments.gpkg", "/home/juju/geodata/GPS/traces_segments_", z_min=3, z_max=15, out_epsg = "3857")
 
