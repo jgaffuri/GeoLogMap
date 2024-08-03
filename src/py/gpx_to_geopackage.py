@@ -6,15 +6,17 @@ import pyproj
 import gpxpy
 from datetime import datetime
 import math
-from geopy.distance import geodesic
+#from geopy.distance import geodesic
 
 date_format = "%Y-%m-%d %H:%M:%S"
 
+'''
 def haversine_distance(point1, point2):
     """Calculate the Haversine distance between two (lat, lon) points."""
     return geodesic(point1, point2).meters
+'''
 
-#TODO do not use
+#TODO do not use ?
 def haversine(coord1, coord2):
     """Calculate the Haversine distance between two points in meters."""
     # Radius of the Earth in meters
@@ -140,7 +142,7 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                             start_time = str(t0).replace("+00:00","")
                             end_time = str(t1).replace("+00:00","")
                             duration_ms = 1000*(datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
-                            length_m = haversine_distance([p0.longitude, p0.latitude],[p1.longitude, p1.latitude])
+                            length_m = haversine([p0.latitude, p0.longitude],[p1.latitude, p1.longitude])
                             speed = 3600 * length_m / duration_ms if duration_ms > 0 else 0
                             line = LineString([(point.longitude, point.latitude) for point in [p0,p1]])
 
