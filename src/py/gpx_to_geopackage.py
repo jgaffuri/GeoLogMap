@@ -128,35 +128,52 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = segment.points
-                        if len(points) < 2:
-                            continue  # Skip segments with less than 2 points
-                        
+                        if len(points) <= 1: continue
+
+                        p0 = points[0]
+                        for i in range(1,len(points)):
+                            p1 = points[i]
+
+                            #make segment p0,p1
+                            t0 = p0.time
+                            t1 = p1.time
+                            start_time = str(t0).replace("+00:00","")
+                            end_time = str(t1).replace("+00:00","")
+                            duration_s = (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
+
+                            length_m = 0 #TODO
+                            speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
+
+                            line = LineString([(point.longitude, point.latitude) for point in [p0,p1]])
+
+                            # Store segment data
+                            segments_data.append({
+                                'geometry': line,
+                                'identifier': str(id),
+                                'start_time': str(start_time).replace("+00:00",""),
+                                'end_time': str(end_time).replace("+00:00",""),
+                                'duration_s': round(duration_s),
+                                'length_m': round(length_m),
+                                'speed': round(speed)
+                            })
+                            id+=1
+
+                            p0 = p1
+
+                        #points = [(point.longitude, point.latitude) for point in segment.points]
+                        #times = [point.time for point in segment.points]
+
                         # Extract coordinates and times
-                        coords = [(point.longitude, point.latitude) for point in points]
-                        times = [point.time for point in points]
+                        #coords = [(point.longitude, point.latitude) for point in points]
+                        #times = [point.time for point in points]
                         
                         # Calculate segment attributes
-                        start_time = str(times[0]).replace("+00:00","")
-                        end_time = str(times[-1]).replace("+00:00","")
-                        duration_s = (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
-                        length_m = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
-                        speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
+                        #length_m = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
+                        #speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
 
                         # Create a LineString geometry
-                        line = LineString(coords)
+                        #line = LineString(coords)
                         
-                        # Store segment data
-                        segments_data.append({
-                            'geometry': line,
-                            'identifier': str(id),
-                            'start_time': str(start_time).replace("+00:00",""),
-                            'end_time': str(end_time).replace("+00:00",""),
-                            'duration_s': round(duration_s),
-                            'length_m': round(length_m),
-                            'speed': round(speed)
-                        })
-                        id+=1
-
         except Exception as e:
             print("Error when reading file: "+file)
             print(e)
