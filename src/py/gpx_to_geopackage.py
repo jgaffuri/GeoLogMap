@@ -108,11 +108,14 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
     segments_data = []
     id = 1
 
-    # Iterate over all GPX files in the folder
-    for filename in os.listdir(folder_path):
-        if not filename.endswith(".gpx"): continue
+    files = os.listdir(folder_path)
+    print(len(files),"files")
 
-        gpx_path = os.path.join(folder_path, filename)
+    # Iterate over all GPX files in the folder
+    for file in files:
+        if not file.endswith(".gpx"): continue
+
+        gpx_path = os.path.join(folder_path, file)
         #print(gpx_path)
 
         try:
@@ -154,7 +157,7 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                         })
                         id+=1
         except:
-            print("Failed handling gpx file", filename)
+            print("Failed handling gpx file", file)
 
     # Convert to GeoDataFrame in the original CRS (EPSG:4326)
     gdf = gpd.GeoDataFrame(segments_data, crs="EPSG:4326")
