@@ -8,6 +8,8 @@ from datetime import datetime
 import math
 from geopy.distance import geodesic
 
+date_format = "%Y-%m-%d %H:%M:%S"
+
 def haversine_distance(point1, point2):
     """Calculate the Haversine distance between two (lat, lon) points."""
     return geodesic(point1, point2).meters
@@ -54,7 +56,6 @@ def linestring_length_haversine(linestring):
 def create_geopackage_from_gpx(folder_path, output_file, out_epsg = "3857"):
 
     id = 1
-    date_format = "%Y-%m-%d %H:%M:%S"
 
     files = os.listdir(folder_path)
     print(len(files),"files")
@@ -132,9 +133,9 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
                         times = [point.time for point in points]
                         
                         # Calculate segment attributes
-                        start_time = times[0]
-                        end_time = times[-1]
-                        duration_s = (end_time - start_time).total_seconds()
+                        start_time = str(times[0]).replace("+00:00","")
+                        end_time = str(times[-1]).replace("+00:00","")
+                        duration_s = (datetime.strptime(end_time, date_format)-datetime.strptime(start_time, date_format)).total_seconds()
                         length_m = sum(haversine_distance(coords[i], coords[i+1]) for i in range(len(coords)-1))
                         speed = (length_m / 1000) / (duration_s / 3600) if duration_s > 0 else 0
 
