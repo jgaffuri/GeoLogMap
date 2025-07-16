@@ -2,6 +2,7 @@
 - refresh GPS map with more recent data
 - improve GPS simplification - add aggregation ?
 
+See https://maplibre.org/
 
 - develop generic style + styles library - or display method
 - extend tiler to all geojson geometry types
