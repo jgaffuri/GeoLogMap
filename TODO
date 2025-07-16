@@ -3,7 +3,7 @@
 - improve GPS simplification - add aggregation ?
 
 
-- develop generic style + styles library
+- develop generic style + styles library - or display method
 - extend tiler to all geojson geometry types
 - extend tiledvectorsource to all geojson geometry types
 
