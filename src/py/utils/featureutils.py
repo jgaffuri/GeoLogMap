@@ -76,10 +76,6 @@ def get_schema_from_geojson_feature(feature):
 
 
 
-
-
-
-
 def save_features_to_gpkg(fs, out_gpkg_file, crs_epsg="3035"):
     """
     Save a list of features with mixed geometry types (points, lines, etc.) 
