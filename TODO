@@ -1,0 +1,26 @@
+
+- refresh GPS map with more recent data
+- improve GPS simplification - add aggregation ?
+
+
+- develop generic style + styles library
+- extend tiler to all geojson geometry types
+- extend tiledvectorsource to all geojson geometry types
+
+LAU use case:
+- generalise LAUs
+- vector tile LAUs
+- vector tile LAU boundaries
+- make LAU map
+
+Points use case:
+- find large point dataset
+- generalise
+- vector tile generalised points
+- make map
+- use client-side force model
+
+Buildings/road use case
+- generalise
+
+
