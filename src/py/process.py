@@ -1,4 +1,5 @@
 
+import convert_to_gpx from 1_uncompress_rename_convert_to_gpx
 
 
 # convert new file into GPX - remove duplicates
