@@ -186,6 +186,3 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
 
 
 
-
-
-
