@@ -135,11 +135,3 @@ def simplify_traces_segments_z(input_gpkg_path, output_gpkg_path, z_min = 1, z_m
 
 
 
-
-
-
-
-
-#simplify_traces_z("/home/juju/geodata/GPS/traces.gpkg", "/home/juju/geodata/GPS/traces_", z_min=3, z_max=15, out_epsg = "3857")
-simplify_traces_segments_z("/home/juju/geodata/GPS/traces_segments.gpkg", "/home/juju/geodata/GPS/traces_segments_", z_min=3, z_max=15, out_epsg = "3857")
-

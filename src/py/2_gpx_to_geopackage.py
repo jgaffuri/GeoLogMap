@@ -188,6 +188,4 @@ def create_geopackage_segments_from_gpx(folder_path, output_file, out_epsg="3857
 
 
 
-create_geopackage_segments_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces_segments.gpkg")
-#create_geopackage_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces.gpkg")
 

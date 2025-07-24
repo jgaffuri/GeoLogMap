@@ -166,7 +166,3 @@ def convert_to_gpx(input_folder, output_folder):
             print("Error when dealing with file: "+file)
             print(e)
 
-
-#uncompress_gz_files("/home/juju/geodata/GPS/strava_new")
-#rename_files_in_folder("/home/juju/geodata/GPS/strava_new")
-convert_to_gpx("/home/juju/geodata/GPS/strava_export_2025_07_16","/home/juju/geodata/GPS/traces")
