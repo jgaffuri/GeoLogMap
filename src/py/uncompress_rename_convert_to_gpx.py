@@ -3,7 +3,7 @@ import gpxpy
 import gpxpy.gpx
 import pandas as pd
 from lxml import etree
-#from fitparse import FitFile, FitParseError
+from fitparse import FitFile, FitParseError
 import shutil
 import gzip
 
@@ -46,7 +46,6 @@ def get_start_time_from_tcx(file_path):
             return pd.to_datetime(time_element.text)
     return None
 
-'''
 def get_start_time_from_fit(file_path):
     try:
         fitfile = FitFile(file_path)
@@ -57,7 +56,6 @@ def get_start_time_from_fit(file_path):
     except FitParseError as e:
         print(f"Error parsing FIT file {file_path}: {e}")
     return None
-'''
 
 
 
@@ -71,8 +69,8 @@ def rename_files_in_folder(folder_path):
             start_time = get_start_time_from_gpx(file_path)
         elif file.endswith(".tcx"):
             start_time = get_start_time_from_tcx(file_path)
-        #elif file.endswith(".fit"):
-        #    start_time = get_start_time_from_fit(file_path)
+        elif file.endswith(".fit"):
+            start_time = get_start_time_from_fit(file_path)
 
         if start_time:
             new_file_name = start_time.strftime(f"%Y-%m-%d_%H-%M-%S.{file.split('.')[-1]}")
@@ -107,7 +105,6 @@ def convert_tcx_to_gpx(tcx_file_path):
     
     return gpx
 
-'''
 def convert_fit_to_gpx(fit_file_path):
     fitfile = FitFile(fit_file_path)
     gpx = gpxpy.gpx.GPX()
@@ -133,7 +130,6 @@ def convert_fit_to_gpx(fit_file_path):
             segment.points.append(point)
     
     return gpx
-'''
 
 
 def convert_to_gpx(input_folder, output_folder):
@@ -153,9 +149,9 @@ def convert_to_gpx(input_folder, output_folder):
             elif file.endswith(".tcx"):
                 start_time = get_start_time_from_tcx(input_file_path)
                 gpx = convert_tcx_to_gpx(input_file_path)
-            #elif file.endswith(".fit"):
-            #    start_time = get_start_time_from_fit(input_file_path)
-            #    gpx = convert_fit_to_gpx(input_file_path)
+            elif file.endswith(".fit"):
+                start_time = get_start_time_from_fit(input_file_path)
+                gpx = convert_fit_to_gpx(input_file_path)
 
             if start_time and gpx:
                 new_file_name = start_time.strftime("%Y-%m-%d_%H-%M-%S.gpx")
