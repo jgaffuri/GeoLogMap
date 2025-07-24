@@ -139,7 +139,7 @@ def convert_fit_to_gpx(fit_file_path):
 def convert_to_gpx(input_folder, output_folder):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-    
+
     for file in os.listdir(input_folder):
         try:
             input_file_path = os.path.join(input_folder, file)
