@@ -1,5 +1,5 @@
 
-from uncompress_rename_convert_to_gpx.py import convert_to_gpx
+from uncompress_rename_convert_to_gpx import convert_to_gpx
 
 
 # convert new file into GPX - remove duplicates
