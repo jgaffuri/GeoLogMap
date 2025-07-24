@@ -253,3 +253,4 @@ def tile(input_gpkg_path_fun, output_folder,z_min = 1, z_max = 10, tile_size = 2
 
 #
 tile(lambda z: "/home/juju/geodata/GPS/traces_"+str(z)+".gpkg", "/home/juju/geodata/GPS/tiled/", z_min=3, z_max=15, origin_x=-9000000, origin_y=-6000000)
+
