@@ -152,6 +152,8 @@ def convert_to_gpx(input_folder, output_folder):
             elif file.endswith(".fit"):
                 start_time = get_start_time_from_fit(input_file_path)
                 gpx = convert_fit_to_gpx(input_file_path)
+            else:
+                print("Unexpected file format:", file)
 
             if start_time and gpx:
                 new_file_name = start_time.strftime("%Y-%m-%d_%H-%M-%S.gpx")

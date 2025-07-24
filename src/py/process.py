@@ -1,9 +1,10 @@
 
-from uncompress_rename_convert_to_gpx import convert_to_gpx
+from uncompress_rename_convert_to_gpx import uncompress_gz_files,convert_to_gpx
 
 
 # convert new file into GPX - remove duplicates
-convert_to_gpx("/home/juju/geodata/GPS/strava_export_2025_07_24/","/home/juju/geodata/GPS/traces/")
+uncompress_gz_files("/home/juju/geodata/GPS/strava_export_2025_07_24/")
+#convert_to_gpx("/home/juju/geodata/GPS/strava_export_2025_07_24/","/home/juju/geodata/GPS/traces2/")
 
 # GPX to GPKG
 #create_geopackage_segments_from_gpx("/home/juju/geodata/GPS/traces", "/home/juju/geodata/GPS/traces_segments.gpkg")
