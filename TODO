@@ -1,6 +1,6 @@
-See https://maplibre.org/
-
 - refresh GPS map with more recent data
+
+- See https://maplibre.org/
 - improve GPS simplification - add aggregation ?
 
 - develop generic style + styles library - or display method
