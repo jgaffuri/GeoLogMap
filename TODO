@@ -2,7 +2,6 @@
 
 test geoportail pbf:
 - https://geoservices.ign.fr/documentation/services/services-geoplateforme/diffusion#70064
-- https://geoservices.ign.fr/documentation/services/api-et-services-ogc/tuiles-vectorielles-tmswmts/styles
 try using it
 try changing style
 
